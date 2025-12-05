@@ -9,7 +9,7 @@ This document breaks down the WellTrack requirements into actionable development
 ### 1.1 Project Initialization
 
 - [x] Create monorepo structure with `/backend` and `/frontend` directories
-- [ ] Initialize backend Node.js project with TypeScript (`npm init`, `tsconfig.json`)
+- [x] Initialize backend Node.js project with TypeScript (`npm init`, `tsconfig.json`)
 - [ ] Install backend dependencies: express, prisma, bcrypt, jsonwebtoken, cors, dotenv, zod
 - [ ] Install dev dependencies: typescript, ts-node-dev, @types packages, eslint, prettier
 - [ ] Create `.env` file with database URL, JWT secrets, and port configuration
