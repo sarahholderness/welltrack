@@ -10,11 +10,11 @@ This document breaks down the WellTrack requirements into actionable development
 
 - [x] Create monorepo structure with `/backend` and `/frontend` directories
 - [x] Initialize backend Node.js project with TypeScript (`npm init`, `tsconfig.json`)
-- [ ] Install backend dependencies: express, prisma, bcrypt, jsonwebtoken, cors, dotenv, zod
-- [ ] Install dev dependencies: typescript, ts-node-dev, @types packages, eslint, prettier
-- [ ] Create `.env` file with database URL, JWT secrets, and port configuration
-- [ ] Set up ESLint and Prettier configuration for consistent code style
-- [ ] Create basic Express server with health check endpoint (`GET /api/health`)
+- [x] Install backend dependencies: express, prisma, bcrypt, jsonwebtoken, cors, dotenv, zod
+- [x] Install dev dependencies: typescript, ts-node-dev, @types packages, eslint, prettier
+- [x] Create `.env` file with database URL, JWT secrets, and port configuration
+- [x] Set up ESLint and Prettier configuration for consistent code style
+- [x] Create basic Express server with health check endpoint (`GET /api/health`)
 
 ### 1.2 Database Setup
 
