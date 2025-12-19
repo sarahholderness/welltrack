@@ -1,6 +1,7 @@
 import express, { Express, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import healthRouter from './routes/health';
+import authRouter from './routes/auth';
 
 const app: Express = express();
 
@@ -10,6 +11,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/health', healthRouter);
+app.use('/api/auth', authRouter);
 
 // 404 handler
 app.use((_req: Request, res: Response) => {
