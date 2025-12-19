@@ -1,4 +1,10 @@
-// WellTrack Backend Entry Point
-// This file will be expanded to include Express server setup
+import dotenv from 'dotenv';
+dotenv.config();
 
-console.log('WellTrack Backend - Starting...');
+import app from './app';
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`WellTrack Backend running on port ${PORT}`);
+});

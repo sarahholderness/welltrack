@@ -10,28 +10,28 @@ This document breaks down the WellTrack requirements into actionable development
 
 - [x] Create monorepo structure with `/backend` and `/frontend` directories
 - [x] Initialize backend Node.js project with TypeScript (`npm init`, `tsconfig.json`)
-- [ ] Install backend dependencies: express, prisma, bcrypt, jsonwebtoken, cors, dotenv, zod
-- [ ] Install dev dependencies: typescript, ts-node-dev, @types packages, eslint, prettier
-- [ ] Create `.env` file with database URL, JWT secrets, and port configuration
-- [ ] Set up ESLint and Prettier configuration for consistent code style
-- [ ] Create basic Express server with health check endpoint (`GET /api/health`)
+- [x] Install backend dependencies: express, prisma, bcrypt, jsonwebtoken, cors, dotenv, zod
+- [x] Install dev dependencies: typescript, ts-node-dev, @types packages, eslint, prettier
+- [x] Create `.env` file with database URL, JWT secrets, and port configuration
+- [x] Set up ESLint and Prettier configuration for consistent code style
+- [x] Create basic Express server with health check endpoint (`GET /api/health`)
 
 ### 1.2 Database Setup
 
-- [ ] Install and configure PostgreSQL locally (or use Docker)
-- [ ] Initialize Prisma (`npx prisma init`)
-- [ ] Create Prisma schema with User model (id, email, password_hash, display_name, timezone, created_at)
-- [ ] Add Symptom model (id, user_id nullable, name, category, is_active)
-- [ ] Add SymptomLog model (id, user_id, symptom_id, severity, notes, logged_at, created_at)
-- [ ] Add MoodLog model (id, user_id, mood_score, energy_level, stress_level, notes, logged_at, created_at)
-- [ ] Add Medication model (id, user_id, name, dosage, frequency, is_active, created_at)
-- [ ] Add MedicationLog model (id, user_id, medication_id, taken, taken_at, notes, created_at)
-- [ ] Add Habit model (id, user_id nullable, name, tracking_type enum, unit, is_active)
-- [ ] Add HabitLog model (id, user_id, habit_id, value_boolean, value_numeric, value_duration, notes, logged_at, created_at)
-- [ ] Add database indexes on (user_id, logged_at) for all log tables
-- [ ] Run initial migration (`npx prisma migrate dev`)
-- [ ] Create seed script for default symptoms (Headache, Fatigue, Joint Pain, etc.)
-- [ ] Create seed script for default habits (Sleep Duration, Water Intake, Exercise, etc.)
+- [x] Install and configure PostgreSQL locally (or use Docker)
+- [x] Initialize Prisma (`npx prisma init`)
+- [x] Create Prisma schema with User model (id, email, password_hash, display_name, timezone, created_at)
+- [x] Add Symptom model (id, user_id nullable, name, category, is_active)
+- [x] Add SymptomLog model (id, user_id, symptom_id, severity, notes, logged_at, created_at)
+- [x] Add MoodLog model (id, user_id, mood_score, energy_level, stress_level, notes, logged_at, created_at)
+- [x] Add Medication model (id, user_id, name, dosage, frequency, is_active, created_at)
+- [x] Add MedicationLog model (id, user_id, medication_id, taken, taken_at, notes, created_at)
+- [x] Add Habit model (id, user_id nullable, name, tracking_type enum, unit, is_active)
+- [x] Add HabitLog model (id, user_id, habit_id, value_boolean, value_numeric, value_duration, notes, logged_at, created_at)
+- [x] Add database indexes on (user_id, logged_at) for all log tables
+- [x] Run initial migration (`npx prisma migrate dev`)
+- [x] Create seed script for default symptoms (Headache, Fatigue, Joint Pain, etc.)
+- [x] Create seed script for default habits (Sleep Duration, Water Intake, Exercise, etc.)
 
 ### 1.3 Authentication System
 
