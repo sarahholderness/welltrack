@@ -1,20 +1,54 @@
 import { Router, Request, Response, NextFunction } from 'express';
+import crypto from 'crypto';
 import { prisma } from '../lib/prisma';
-import { hashPassword } from '../utils/password';
-import { generateTokens } from '../utils/jwt';
-import { registerSchema } from '../validators/auth';
+import { hashPassword, verifyPassword } from '../utils/password';
+import { generateTokens, verifyRefreshToken } from '../utils/jwt';
+import {
+  registerSchema,
+  loginSchema,
+  refreshSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
+} from '../validators/auth';
 import { ZodError } from 'zod';
 
 const router = Router();
 
+// Helper to format user response (excludes sensitive fields)
+function formatUserResponse(user: {
+  id: string;
+  email: string;
+  displayName: string | null;
+  timezone: string;
+  createdAt: Date;
+}) {
+  return {
+    id: user.id,
+    email: user.email,
+    displayName: user.displayName,
+    timezone: user.timezone,
+    createdAt: user.createdAt,
+  };
+}
+
+// Helper to handle Zod validation errors
+function handleZodError(error: ZodError, res: Response): void {
+  res.status(400).json({
+    error: 'Validation failed',
+    details: error.issues.map((issue) => ({
+      field: issue.path.join('.'),
+      message: issue.message,
+    })),
+  });
+}
+
+// POST /api/auth/register
 router.post(
   '/register',
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // Validate input
       const data = registerSchema.parse(req.body);
 
-      // Check if email already exists
       const existingUser = await prisma.user.findUnique({
         where: { email: data.email },
       });
@@ -24,10 +58,8 @@ router.post(
         return;
       }
 
-      // Hash password
       const passwordHash = await hashPassword(data.password);
 
-      // Create user
       const user = await prisma.user.create({
         data: {
           email: data.email,
@@ -36,28 +68,208 @@ router.post(
         },
       });
 
-      // Generate tokens
       const tokens = generateTokens({ userId: user.id, email: user.email });
 
       res.status(201).json({
-        user: {
-          id: user.id,
-          email: user.email,
-          displayName: user.displayName,
-          timezone: user.timezone,
-          createdAt: user.createdAt,
-        },
+        user: formatUserResponse(user),
         ...tokens,
       });
     } catch (error) {
       if (error instanceof ZodError) {
-        res.status(400).json({
-          error: 'Validation failed',
-          details: error.issues.map((issue) => ({
-            field: issue.path.join('.'),
-            message: issue.message,
-          })),
+        handleZodError(error, res);
+        return;
+      }
+      next(error);
+    }
+  }
+);
+
+// POST /api/auth/login
+router.post(
+  '/login',
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const data = loginSchema.parse(req.body);
+
+      const user = await prisma.user.findUnique({
+        where: { email: data.email },
+      });
+
+      if (!user) {
+        res.status(401).json({ error: 'Invalid email or password' });
+        return;
+      }
+
+      const isValidPassword = await verifyPassword(
+        data.password,
+        user.passwordHash
+      );
+
+      if (!isValidPassword) {
+        res.status(401).json({ error: 'Invalid email or password' });
+        return;
+      }
+
+      const tokens = generateTokens({ userId: user.id, email: user.email });
+
+      res.json({
+        user: formatUserResponse(user),
+        ...tokens,
+      });
+    } catch (error) {
+      if (error instanceof ZodError) {
+        handleZodError(error, res);
+        return;
+      }
+      next(error);
+    }
+  }
+);
+
+// POST /api/auth/refresh
+router.post(
+  '/refresh',
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const data = refreshSchema.parse(req.body);
+
+      let payload;
+      try {
+        payload = verifyRefreshToken(data.refreshToken);
+      } catch {
+        res.status(401).json({ error: 'Invalid or expired refresh token' });
+        return;
+      }
+
+      // Verify user still exists
+      const user = await prisma.user.findUnique({
+        where: { id: payload.userId },
+      });
+
+      if (!user) {
+        res.status(401).json({ error: 'User not found' });
+        return;
+      }
+
+      const tokens = generateTokens({ userId: user.id, email: user.email });
+
+      res.json(tokens);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        handleZodError(error, res);
+        return;
+      }
+      next(error);
+    }
+  }
+);
+
+// POST /api/auth/logout
+router.post('/logout', async (_req: Request, res: Response) => {
+  // For stateless JWT, logout is handled client-side by discarding tokens
+  // In a production app, you might add the refresh token to a blocklist
+  res.json({ message: 'Logged out successfully' });
+});
+
+// POST /api/auth/forgot-password
+router.post(
+  '/forgot-password',
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const data = forgotPasswordSchema.parse(req.body);
+
+      const user = await prisma.user.findUnique({
+        where: { email: data.email },
+      });
+
+      // Always return success to prevent email enumeration
+      if (!user) {
+        res.json({
+          message:
+            'If an account with that email exists, a password reset link has been sent',
         });
+        return;
+      }
+
+      // Delete any existing reset tokens for this user
+      await prisma.passwordResetToken.deleteMany({
+        where: { userId: user.id },
+      });
+
+      // Generate a secure random token
+      const resetToken = crypto.randomBytes(32).toString('hex');
+
+      // Token expires in 1 hour
+      const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+
+      await prisma.passwordResetToken.create({
+        data: {
+          userId: user.id,
+          token: resetToken,
+          expiresAt,
+        },
+      });
+
+      // Log the reset token (in production, send via email)
+      console.log(`Password reset token for ${user.email}: ${resetToken}`);
+
+      res.json({
+        message:
+          'If an account with that email exists, a password reset link has been sent',
+      });
+    } catch (error) {
+      if (error instanceof ZodError) {
+        handleZodError(error, res);
+        return;
+      }
+      next(error);
+    }
+  }
+);
+
+// POST /api/auth/reset-password
+router.post(
+  '/reset-password',
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const data = resetPasswordSchema.parse(req.body);
+
+      const resetToken = await prisma.passwordResetToken.findUnique({
+        where: { token: data.token },
+        include: { user: true },
+      });
+
+      if (!resetToken) {
+        res.status(400).json({ error: 'Invalid or expired reset token' });
+        return;
+      }
+
+      if (resetToken.expiresAt < new Date()) {
+        // Delete expired token
+        await prisma.passwordResetToken.delete({
+          where: { id: resetToken.id },
+        });
+        res.status(400).json({ error: 'Invalid or expired reset token' });
+        return;
+      }
+
+      const passwordHash = await hashPassword(data.password);
+
+      // Update password and delete the reset token
+      await prisma.$transaction([
+        prisma.user.update({
+          where: { id: resetToken.userId },
+          data: { passwordHash },
+        }),
+        prisma.passwordResetToken.delete({
+          where: { id: resetToken.id },
+        }),
+      ]);
+
+      res.json({ message: 'Password reset successfully' });
+    } catch (error) {
+      if (error instanceof ZodError) {
+        handleZodError(error, res);
         return;
       }
       next(error);
