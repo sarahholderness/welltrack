@@ -1,0 +1,167 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================
+// User Model
+// ============================================
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  displayName  String?  @map("display_name")
+  timezone     String   @default("UTC")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // Relations
+  symptoms       Symptom[]
+  symptomLogs    SymptomLog[]
+  moodLogs       MoodLog[]
+  medications    Medication[]
+  medicationLogs MedicationLog[]
+  habits         Habit[]
+  habitLogs      HabitLog[]
+
+  @@map("users")
+}
+
+// ============================================
+// Symptom Models
+// ============================================
+model Symptom {
+  id       String  @id @default(uuid())
+  userId   String? @map("user_id") // null means system default
+  name     String
+  category String?
+  isActive Boolean @default(true) @map("is_active")
+
+  // Relations
+  user        User?        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  symptomLogs SymptomLog[]
+
+  @@map("symptoms")
+}
+
+model SymptomLog {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  symptomId String   @map("symptom_id")
+  severity  Int // 1-10
+  notes     String?
+  loggedAt  DateTime @map("logged_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  symptom Symptom @relation(fields: [symptomId], references: [id], onDelete: Cascade)
+
+  @@index([userId, loggedAt])
+  @@map("symptom_logs")
+}
+
+// ============================================
+// Mood Model
+// ============================================
+model MoodLog {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  moodScore   Int      @map("mood_score") // 1-5
+  energyLevel Int?     @map("energy_level") // 1-5, optional
+  stressLevel Int?     @map("stress_level") // 1-5, optional
+  notes       String?
+  loggedAt    DateTime @map("logged_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, loggedAt])
+  @@map("mood_logs")
+}
+
+// ============================================
+// Medication Models
+// ============================================
+model Medication {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  name      String
+  dosage    String? // e.g., "500mg"
+  frequency String? // e.g., "twice daily"
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  medicationLogs MedicationLog[]
+
+  @@map("medications")
+}
+
+model MedicationLog {
+  id           String    @id @default(uuid())
+  userId       String    @map("user_id")
+  medicationId String    @map("medication_id")
+  taken        Boolean
+  takenAt      DateTime? @map("taken_at")
+  notes        String?
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  medication Medication @relation(fields: [medicationId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("medication_logs")
+}
+
+// ============================================
+// Habit Models
+// ============================================
+enum TrackingType {
+  boolean
+  numeric
+  duration
+}
+
+model Habit {
+  id           String       @id @default(uuid())
+  userId       String?      @map("user_id") // null means system default
+  name         String
+  trackingType TrackingType @map("tracking_type")
+  unit         String? // e.g., "hours", "glasses"
+  isActive     Boolean      @default(true) @map("is_active")
+
+  // Relations
+  user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  habitLogs HabitLog[]
+
+  @@map("habits")
+}
+
+model HabitLog {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  habitId       String   @map("habit_id")
+  valueBoolean  Boolean? @map("value_boolean") // for yes/no habits
+  valueNumeric  Float?   @map("value_numeric") // for number habits
+  valueDuration Int?     @map("value_duration") // minutes, for duration habits
+  notes         String?
+  loggedAt      DateTime @map("logged_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  habit Habit @relation(fields: [habitId], references: [id], onDelete: Cascade)
+
+  @@index([userId, loggedAt])
+  @@map("habit_logs")
+}
