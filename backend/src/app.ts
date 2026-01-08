@@ -7,6 +7,7 @@ import symptomsRouter from './routes/symptoms';
 import symptomLogsRouter from './routes/symptomLogs';
 import moodLogsRouter from './routes/moodLogs';
 import medicationsRouter from './routes/medications';
+import medicationLogsRouter from './routes/medicationLogs';
 
 const app: Express = express();
 
@@ -22,6 +23,7 @@ app.use('/api/symptoms', symptomsRouter);
 app.use('/api/symptom-logs', symptomLogsRouter);
 app.use('/api/mood-logs', moodLogsRouter);
 app.use('/api/medications', medicationsRouter);
+app.use('/api/medication-logs', medicationLogsRouter);
 
 // 404 handler
 app.use((_req: Request, res: Response) => {

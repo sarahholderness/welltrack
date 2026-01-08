@@ -86,10 +86,10 @@ This document breaks down the WellTrack requirements into actionable development
 
 ### 1.9 Medication Log Endpoints
 
-- [ ] Implement `GET /api/medication-logs` - return logs with date range filtering
-- [ ] Implement `POST /api/medication-logs` - log medication taken/not taken
-- [ ] Implement `PATCH /api/medication-logs/:id` - update log
-- [ ] Implement `DELETE /api/medication-logs/:id` - delete log
+- [x] Implement `GET /api/medication-logs` - return logs with date range filtering
+- [x] Implement `POST /api/medication-logs` - log medication taken/not taken
+- [x] Implement `PATCH /api/medication-logs/:id` - update log
+- [x] Implement `DELETE /api/medication-logs/:id` - delete log
 
 ### 1.10 Habit Endpoints
 
