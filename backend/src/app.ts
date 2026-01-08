@@ -5,6 +5,7 @@ import authRouter from './routes/auth';
 import usersRouter from './routes/users';
 import symptomsRouter from './routes/symptoms';
 import symptomLogsRouter from './routes/symptomLogs';
+import moodLogsRouter from './routes/moodLogs';
 
 const app: Express = express();
 
@@ -18,6 +19,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/symptoms', symptomsRouter);
 app.use('/api/symptom-logs', symptomLogsRouter);
+app.use('/api/mood-logs', moodLogsRouter);
 
 // 404 handler
 app.use((_req: Request, res: Response) => {
