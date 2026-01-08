@@ -56,11 +56,11 @@ This document breaks down the WellTrack requirements into actionable development
 
 ### 1.5 Symptom Endpoints
 
-- [ ] Implement `GET /api/symptoms` - return system defaults + user's custom symptoms
-- [ ] Implement `POST /api/symptoms` - create custom symptom for user
-- [ ] Implement `PATCH /api/symptoms/:id` - update symptom (name, category, is_active)
-- [ ] Implement `DELETE /api/symptoms/:id` - delete custom symptom (prevent deleting system defaults)
-- [ ] Add validation: users can only modify their own symptoms
+- [x] Implement `GET /api/symptoms` - return system defaults + user's custom symptoms
+- [x] Implement `POST /api/symptoms` - create custom symptom for user
+- [x] Implement `PATCH /api/symptoms/:id` - update symptom (name, category, is_active)
+- [x] Implement `DELETE /api/symptoms/:id` - delete custom symptom (prevent deleting system defaults)
+- [x] Add validation: users can only modify their own symptoms
 
 ### 1.6 Symptom Log Endpoints
 
