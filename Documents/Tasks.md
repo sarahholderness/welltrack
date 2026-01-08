@@ -72,10 +72,10 @@ This document breaks down the WellTrack requirements into actionable development
 
 ### 1.7 Mood Log Endpoints
 
-- [ ] Implement `GET /api/mood-logs` - return logs with date range filtering
-- [ ] Implement `POST /api/mood-logs` - create log with mood_score (1-5), optional energy/stress
-- [ ] Implement `PATCH /api/mood-logs/:id` - update existing log
-- [ ] Implement `DELETE /api/mood-logs/:id` - delete log
+- [x] Implement `GET /api/mood-logs` - return logs with date range filtering
+- [x] Implement `POST /api/mood-logs` - create log with mood_score (1-5), optional energy/stress
+- [x] Implement `PATCH /api/mood-logs/:id` - update existing log
+- [x] Implement `DELETE /api/mood-logs/:id` - delete log
 
 ### 1.8 Medication Endpoints
 
