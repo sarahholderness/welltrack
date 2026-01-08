@@ -93,10 +93,10 @@ This document breaks down the WellTrack requirements into actionable development
 
 ### 1.10 Habit Endpoints
 
-- [ ] Implement `GET /api/habits` - return system defaults + user's custom habits
-- [ ] Implement `POST /api/habits` - create custom habit with tracking_type (boolean/numeric/duration)
-- [ ] Implement `PATCH /api/habits/:id` - update habit details
-- [ ] Implement `DELETE /api/habits/:id` - delete custom habit
+- [x] Implement `GET /api/habits` - return system defaults + user's custom habits
+- [x] Implement `POST /api/habits` - create custom habit with tracking_type (boolean/numeric/duration)
+- [x] Implement `PATCH /api/habits/:id` - update habit details
+- [x] Implement `DELETE /api/habits/:id` - delete custom habit
 
 ### 1.11 Habit Log Endpoints
 
