@@ -64,11 +64,11 @@ This document breaks down the WellTrack requirements into actionable development
 
 ### 1.6 Symptom Log Endpoints
 
-- [ ] Implement `GET /api/symptom-logs` - return logs with date range filtering, pagination
-- [ ] Implement `POST /api/symptom-logs` - create new log with severity (1-10), optional notes
-- [ ] Implement `PATCH /api/symptom-logs/:id` - update existing log
-- [ ] Implement `DELETE /api/symptom-logs/:id` - delete log
-- [ ] Ensure users can only access their own logs
+- [x] Implement `GET /api/symptom-logs` - return logs with date range filtering, pagination
+- [x] Implement `POST /api/symptom-logs` - create new log with severity (1-10), optional notes
+- [x] Implement `PATCH /api/symptom-logs/:id` - update existing log
+- [x] Implement `DELETE /api/symptom-logs/:id` - delete log
+- [x] Ensure users can only access their own logs
 
 ### 1.7 Mood Log Endpoints
 

@@ -214,12 +214,15 @@ describe('Symptom Endpoints', () => {
 
     it('should return 403 when trying to modify another user\'s symptom', async () => {
       // Create another user and their symptom via API
+      const uniqueEmail = `symptom-other-user-${Date.now()}@example.com`;
       const otherUserResponse = await request(app)
         .post('/api/auth/register')
         .send({
-          email: 'symptom-other-user@example.com',
+          email: uniqueEmail,
           password: 'password123',
         });
+
+      expect(otherUserResponse.status).toBe(201);
       const otherAccessToken = otherUserResponse.body.accessToken;
 
       // Create symptom as other user
@@ -228,6 +231,7 @@ describe('Symptom Endpoints', () => {
         .set('Authorization', `Bearer ${otherAccessToken}`)
         .send({ name: 'Other User Symptom' });
 
+      expect(otherSymptomResponse.status).toBe(201);
       const otherSymptomId = otherSymptomResponse.body.symptom.id;
 
       // Try to modify with original user's token
@@ -305,12 +309,15 @@ describe('Symptom Endpoints', () => {
 
     it('should return 403 when trying to delete another user\'s symptom', async () => {
       // Create another user and their symptom via API
+      const uniqueEmail = `symptom-delete-other-${Date.now()}@example.com`;
       const otherUserResponse = await request(app)
         .post('/api/auth/register')
         .send({
-          email: 'symptom-delete-other@example.com',
+          email: uniqueEmail,
           password: 'password123',
         });
+
+      expect(otherUserResponse.status).toBe(201);
       const otherAccessToken = otherUserResponse.body.accessToken;
 
       // Create symptom as other user
@@ -319,6 +326,7 @@ describe('Symptom Endpoints', () => {
         .set('Authorization', `Bearer ${otherAccessToken}`)
         .send({ name: 'Other User Symptom' });
 
+      expect(otherSymptomResponse.status).toBe(201);
       const otherSymptomId = otherSymptomResponse.body.symptom.id;
 
       // Try to delete with original user's token
