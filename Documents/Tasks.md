@@ -79,10 +79,10 @@ This document breaks down the WellTrack requirements into actionable development
 
 ### 1.8 Medication Endpoints
 
-- [ ] Implement `GET /api/medications` - return user's medications
-- [ ] Implement `POST /api/medications` - create medication with name, optional dosage/frequency
-- [ ] Implement `PATCH /api/medications/:id` - update medication details
-- [ ] Implement `DELETE /api/medications/:id` - delete medication
+- [x] Implement `GET /api/medications` - return user's medications
+- [x] Implement `POST /api/medications` - create medication with name, optional dosage/frequency
+- [x] Implement `PATCH /api/medications/:id` - update medication details
+- [x] Implement `DELETE /api/medications/:id` - delete medication
 
 ### 1.9 Medication Log Endpoints
 
