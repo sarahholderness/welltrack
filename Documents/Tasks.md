@@ -100,17 +100,17 @@ This document breaks down the WellTrack requirements into actionable development
 
 ### 1.11 Habit Log Endpoints
 
-- [ ] Implement `GET /api/habit-logs` - return logs with date range filtering
-- [ ] Implement `POST /api/habit-logs` - create log with appropriate value field based on tracking_type
-- [ ] Implement `PATCH /api/habit-logs/:id` - update log
-- [ ] Implement `DELETE /api/habit-logs/:id` - delete log
+- [x] Implement `GET /api/habit-logs` - return logs with date range filtering
+- [x] Implement `POST /api/habit-logs` - create log with appropriate value field based on tracking_type
+- [x] Implement `PATCH /api/habit-logs/:id` - update log
+- [x] Implement `DELETE /api/habit-logs/:id` - delete log
 
 ### 1.12 Backend Testing & Documentation
 
-- [ ] Set up Jest for backend testing
-- [ ] Write tests for auth endpoints (register, login, token refresh)
-- [ ] Write tests for CRUD operations on at least one resource (e.g., symptoms)
-- [ ] Test date filtering and pagination on log endpoints
+- [x] Set up Jest for backend testing
+- [x] Write tests for auth endpoints (register, login, token refresh)
+- [x] Write tests for CRUD operations on at least one resource (e.g., symptoms)
+- [x] Test date filtering and pagination on log endpoints
 - [ ] Document API endpoints in README or simple API docs
 
 ---
