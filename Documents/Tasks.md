@@ -146,10 +146,10 @@ This document breaks down the WellTrack requirements into actionable development
 
 ### 2.4 Layout & Navigation
 
-- [ ] Create main app layout with header and navigation
-- [ ] Build bottom navigation bar for mobile (Dashboard, Log, History, Trends, Settings)
-- [ ] Create responsive sidebar for desktop view
-- [ ] Add user menu with logout option
+- [x] Create main app layout with header and navigation
+- [x] Build bottom navigation bar for mobile (Dashboard, Log, History, Trends, Settings)
+- [x] Create responsive sidebar for desktop view
+- [x] Add user menu with logout option
 
 ### 2.5 Dashboard Page
 
