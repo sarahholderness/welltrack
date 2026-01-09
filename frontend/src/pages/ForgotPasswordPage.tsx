@@ -1,6 +1,42 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { authService } from '../services';
+import { Input, Button, Alert } from '../components/ui';
+import { forgotPasswordSchema } from '../validators/auth';
+import type { ForgotPasswordFormData } from '../validators/auth';
+import type { AxiosError } from 'axios';
+import type { ApiError } from '../types';
 
 export function ForgotPasswordPage() {
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<ForgotPasswordFormData>({
+    resolver: zodResolver(forgotPasswordSchema),
+  });
+
+  const onSubmit = async (data: ForgotPasswordFormData) => {
+    setApiError(null);
+    setSuccessMessage(null);
+    try {
+      const response = await authService.forgotPassword(data.email);
+      setSuccessMessage(response.message);
+    } catch (error) {
+      const axiosError = error as AxiosError<ApiError>;
+      if (axiosError.response?.data?.error) {
+        setApiError(axiosError.response.data.error);
+      } else {
+        setApiError('An unexpected error occurred. Please try again.');
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="max-w-md w-full space-y-8">
@@ -13,7 +49,51 @@ export function ForgotPasswordPage() {
         </div>
 
         <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200">
-          <p className="text-gray-500 text-center">Forgot password form will be implemented in task 2.3</p>
+          {apiError && (
+            <Alert variant="error" className="mb-6">
+              {apiError}
+            </Alert>
+          )}
+
+          {successMessage && (
+            <Alert variant="success" className="mb-6">
+              {successMessage}
+            </Alert>
+          )}
+
+          {!successMessage && (
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <Input
+                label="Email address"
+                type="email"
+                autoComplete="email"
+                placeholder="you@example.com"
+                error={errors.email?.message}
+                {...register('email')}
+              />
+
+              <Button type="submit" isLoading={isSubmitting} className="w-full">
+                Send reset link
+              </Button>
+            </form>
+          )}
+
+          {successMessage && (
+            <div className="text-center">
+              <p className="text-gray-600 mb-4">
+                Check your email for the reset link. If you don't see it, check your spam folder.
+              </p>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSuccessMessage(null);
+                  setApiError(null);
+                }}
+              >
+                Send another link
+              </Button>
+            </div>
+          )}
         </div>
 
         <div className="text-center">
