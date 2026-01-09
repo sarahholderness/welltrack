@@ -51,22 +51,19 @@ export function SymptomLogModal({ isOpen, onClose, onSuccess }: SymptomLogModalP
     }
   }, [isOpen]);
 
-  // Round to nearest 15-minute interval
-  const roundToQuarterHour = (date: Date): string => {
-    const rounded = new Date(date);
-    const minutes = Math.floor(rounded.getMinutes() / 15) * 15;
-    rounded.setMinutes(minutes, 0, 0);
-    return rounded.toISOString().slice(0, 16);
-  };
-
   // Reset form when modal opens
   useEffect(() => {
     if (isOpen) {
+      // Round to nearest 15-minute interval
+      const now = new Date();
+      const minutes = Math.floor(now.getMinutes() / 15) * 15;
+      now.setMinutes(minutes, 0, 0);
+
       reset({
         symptomId: '',
         severity: 5,
         notes: '',
-        loggedAt: roundToQuarterHour(new Date()),
+        loggedAt: now.toISOString().slice(0, 16),
       });
       setApiError(null);
       setSuccessMessage(null);
@@ -197,66 +194,24 @@ export function SymptomLogModal({ isOpen, onClose, onSuccess }: SymptomLogModalP
           <Controller
             name="loggedAt"
             control={control}
-            render={({ field: { value, onChange } }) => {
-              const date = value ? new Date(value) : new Date();
-              const dateStr = date.toISOString().split('T')[0];
-              const hours = date.getHours();
-              const minutes = Math.floor(date.getMinutes() / 15) * 15;
-
-              const handleDateChange = (newDate: string) => {
-                const updated = new Date(value || new Date());
-                const [year, month, day] = newDate.split('-').map(Number);
-                updated.setFullYear(year, month - 1, day);
-                onChange(updated.toISOString().slice(0, 16));
-              };
-
-              const handleTimeChange = (newHours: number, newMinutes: number) => {
-                const updated = new Date(value || new Date());
-                updated.setHours(newHours, newMinutes, 0, 0);
-                onChange(updated.toISOString().slice(0, 16));
-              };
-
-              return (
-                <div className="space-y-1">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Date & Time
-                  </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="date"
-                      value={dateStr}
-                      onChange={(e) => handleDateChange(e.target.value)}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-gray-900
-                        focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                    />
-                    <select
-                      value={hours}
-                      onChange={(e) => handleTimeChange(parseInt(e.target.value, 10), minutes)}
-                      className="w-20 px-2 py-2 border border-gray-300 rounded-lg text-gray-900
-                        focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                    >
-                      {Array.from({ length: 24 }, (_, i) => (
-                        <option key={i} value={i}>
-                          {i.toString().padStart(2, '0')}
-                        </option>
-                      ))}
-                    </select>
-                    <span className="flex items-center text-gray-500">:</span>
-                    <select
-                      value={minutes}
-                      onChange={(e) => handleTimeChange(hours, parseInt(e.target.value, 10))}
-                      className="w-20 px-2 py-2 border border-gray-300 rounded-lg text-gray-900
-                        focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                    >
-                      <option value={0}>00</option>
-                      <option value={15}>15</option>
-                      <option value={30}>30</option>
-                      <option value={45}>45</option>
-                    </select>
-                  </div>
-                </div>
-              );
-            }}
+            render={({ field }) => (
+              <div className="space-y-1">
+                <label
+                  htmlFor="logged-at"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Date & Time
+                </label>
+                <input
+                  type="datetime-local"
+                  id="logged-at"
+                  step="900"
+                  className="block w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900
+                    focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  {...field}
+                />
+              </div>
+            )}
           />
 
           {/* Submit button */}
