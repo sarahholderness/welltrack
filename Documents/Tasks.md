@@ -111,7 +111,7 @@ This document breaks down the WellTrack requirements into actionable development
 - [x] Write tests for auth endpoints (register, login, token refresh)
 - [x] Write tests for CRUD operations on at least one resource (e.g., symptoms)
 - [x] Test date filtering and pagination on log endpoints
-- [ ] Document API endpoints in README or simple API docs
+- [x] Document API endpoints in README or simple API docs
 
 ---
 
