@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { XIcon } from '../icons';
 
 interface ModalProps {
@@ -10,6 +10,28 @@ interface ModalProps {
 
 export function Modal({ isOpen, onClose, title, children }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [shouldRender, setShouldRender] = useState(false);
+
+  // Handle open/close animations
+  useEffect(() => {
+    if (isOpen) {
+      setShouldRender(true);
+      // Trigger animation on next frame
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setIsAnimating(true);
+        });
+      });
+    } else {
+      setIsAnimating(false);
+      // Wait for animation to complete before unmounting
+      const timer = setTimeout(() => {
+        setShouldRender(false);
+      }, 200);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
 
   // Close on escape key
   useEffect(() => {
@@ -37,13 +59,15 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
     }
   }, [isOpen]);
 
-  if (!isOpen) return null;
+  if (!shouldRender) return null;
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/50 transition-opacity"
+        className={`fixed inset-0 bg-black transition-opacity duration-200 ease-out ${
+          isAnimating ? 'opacity-50' : 'opacity-0'
+        }`}
         onClick={onClose}
         aria-hidden="true"
       />
@@ -56,7 +80,11 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
           aria-modal="true"
           aria-labelledby="modal-title"
           tabIndex={-1}
-          className="relative w-full max-w-lg bg-white rounded-t-2xl sm:rounded-2xl shadow-xl transform transition-all"
+          className={`relative w-full max-w-lg bg-white rounded-t-2xl sm:rounded-2xl shadow-xl transition-all duration-200 ease-out ${
+            isAnimating
+              ? 'opacity-100 translate-y-0 scale-100'
+              : 'opacity-0 translate-y-4 scale-95'
+          }`}
         >
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
