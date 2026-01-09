@@ -128,11 +128,11 @@ This document breaks down the WellTrack requirements into actionable development
 
 ### 2.2 Authentication State & Routing
 
-- [ ] Create AuthContext for managing user state and tokens
-- [ ] Implement token storage (localStorage or httpOnly cookies)
-- [ ] Create ProtectedRoute component to guard authenticated pages
-- [ ] Set up React Router with public and protected routes
-- [ ] Implement automatic token refresh on 401 responses
+- [x] Create AuthContext for managing user state and tokens
+- [x] Implement token storage (localStorage or httpOnly cookies)
+- [x] Create ProtectedRoute component to guard authenticated pages
+- [x] Set up React Router with public and protected routes
+- [x] Implement automatic token refresh on 401 responses
 
 ### 2.3 Auth Pages
 
