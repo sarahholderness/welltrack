@@ -119,12 +119,12 @@ This document breaks down the WellTrack requirements into actionable development
 
 ### 2.1 React Project Setup
 
-- [ ] Initialize React app with Vite and TypeScript (`npm create vite@latest`)
-- [ ] Install dependencies: react-router-dom, axios, tailwindcss, react-hook-form, zod
-- [ ] Configure Tailwind CSS with custom color palette (soft teal, sage - per requirements)
-- [ ] Set up folder structure: `/components`, `/pages`, `/hooks`, `/services`, `/types`
-- [ ] Create API service layer with axios instance and interceptors for auth
-- [ ] Set up environment variables for API base URL
+- [x] Initialize React app with Vite and TypeScript (`npm create vite@latest`)
+- [x] Install dependencies: react-router-dom, axios, tailwindcss, react-hook-form, zod
+- [x] Configure Tailwind CSS with custom color palette (soft teal, sage - per requirements)
+- [x] Set up folder structure: `/components`, `/pages`, `/hooks`, `/services`, `/types`
+- [x] Create API service layer with axios instance and interceptors for auth
+- [x] Set up environment variables for API base URL
 
 ### 2.2 Authentication State & Routing
 
