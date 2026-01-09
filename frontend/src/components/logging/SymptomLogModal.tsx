@@ -89,11 +89,20 @@ export function SymptomLogModal({ isOpen, onClose, onSuccess }: SymptomLogModalP
     setSuccessMessage(null);
 
     try {
+      // Round to nearest 15-minute interval
+      let loggedAt: string | undefined;
+      if (data.loggedAt) {
+        const date = new Date(data.loggedAt);
+        const minutes = Math.round(date.getMinutes() / 15) * 15;
+        date.setMinutes(minutes, 0, 0);
+        loggedAt = date.toISOString();
+      }
+
       await symptomsService.createSymptomLog({
         symptomId: data.symptomId,
         severity: data.severity,
         notes: data.notes || undefined,
-        loggedAt: data.loggedAt ? new Date(data.loggedAt).toISOString() : undefined,
+        loggedAt,
       });
 
       setSuccessMessage('Symptom logged successfully!');
@@ -205,7 +214,6 @@ export function SymptomLogModal({ isOpen, onClose, onSuccess }: SymptomLogModalP
                 <input
                   type="datetime-local"
                   id="logged-at"
-                  step="900"
                   className="block w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900
                     focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   {...field}
