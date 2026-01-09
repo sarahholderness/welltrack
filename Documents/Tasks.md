@@ -162,13 +162,13 @@ This document breaks down the WellTrack requirements into actionable development
 
 ### 2.6 Symptom Logging
 
-- [ ] Create SymptomLogModal component
-- [ ] Build symptom selector (dropdown or searchable list)
-- [ ] Create severity slider/input (1-10 scale) with visual feedback
-- [ ] Add optional notes textarea
-- [ ] Add date/time picker (defaults to now)
-- [ ] Implement form submission to API
-- [ ] Add success feedback and close modal
+- [x] Create SymptomLogModal component
+- [x] Build symptom selector (dropdown or searchable list)
+- [x] Create severity slider/input (1-10 scale) with visual feedback
+- [x] Add optional notes textarea
+- [x] Add date/time picker (defaults to now)
+- [x] Implement form submission to API
+- [x] Add success feedback and close modal
 
 ### 2.7 Mood Logging
 
