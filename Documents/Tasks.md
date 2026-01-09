@@ -136,13 +136,13 @@ This document breaks down the WellTrack requirements into actionable development
 
 ### 2.3 Auth Pages
 
-- [ ] Create Login page with email/password form
-- [ ] Create Register page with email/password/confirm password form
-- [ ] Create Forgot Password page with email input
-- [ ] Create Reset Password page with new password form
-- [ ] Add form validation with react-hook-form and Zod
-- [ ] Display API error messages to users
-- [ ] Add loading states to submit buttons
+- [x] Create Login page with email/password form
+- [x] Create Register page with email/password/confirm password form
+- [x] Create Forgot Password page with email input
+- [x] Create Reset Password page with new password form
+- [x] Add form validation with react-hook-form and Zod
+- [x] Display API error messages to users
+- [x] Add loading states to submit buttons
 
 ### 2.4 Layout & Navigation
 
