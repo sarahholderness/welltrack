@@ -153,12 +153,12 @@ This document breaks down the WellTrack requirements into actionable development
 
 ### 2.5 Dashboard Page
 
-- [ ] Create Dashboard page component
-- [ ] Display current date and greeting
-- [ ] Build "Today's Summary" section showing logged items
-- [ ] Create quick-add buttons for each log type (symptoms, mood, meds, habits)
-- [ ] Show "days logged this week" streak indicator
-- [ ] Fetch and display today's logs on mount
+- [x] Create Dashboard page component
+- [x] Display current date and greeting
+- [x] Build "Today's Summary" section showing logged items
+- [x] Create quick-add buttons for each log type (symptoms, mood, meds, habits)
+- [x] Show "days logged this week" streak indicator
+- [x] Fetch and display today's logs on mount
 
 ### 2.6 Symptom Logging
 
