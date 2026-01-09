@@ -10,13 +10,13 @@ export interface CreateSymptomLogData {
 
 export const symptomsService = {
   async getSymptoms(): Promise<Symptom[]> {
-    const response = await api.get<Symptom[]>('/symptoms');
-    return response.data;
+    const response = await api.get<{ symptoms: Symptom[] }>('/symptoms');
+    return response.data.symptoms;
   },
 
   async createSymptomLog(data: CreateSymptomLogData): Promise<SymptomLog> {
-    const response = await api.post<SymptomLog>('/symptom-logs', data);
-    return response.data;
+    const response = await api.post<{ log: SymptomLog }>('/symptom-logs', data);
+    return response.data.log;
   },
 
   async getSymptomLogs(params?: {

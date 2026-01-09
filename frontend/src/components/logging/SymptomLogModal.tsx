@@ -40,7 +40,7 @@ export function SymptomLogModal({ isOpen, onClose, onSuccess }: SymptomLogModalP
       symptomId: '',
       severity: 5,
       notes: '',
-      loggedAt: new Date().toISOString().slice(0, 16), // Format: YYYY-MM-DDTHH:mm
+      loggedAt: '', // Set in useEffect when modal opens
     },
   });
 
@@ -54,11 +54,16 @@ export function SymptomLogModal({ isOpen, onClose, onSuccess }: SymptomLogModalP
   // Reset form when modal opens
   useEffect(() => {
     if (isOpen) {
+      // Round to nearest 15-minute interval
+      const now = new Date();
+      const minutes = Math.floor(now.getMinutes() / 15) * 15;
+      now.setMinutes(minutes, 0, 0);
+
       reset({
         symptomId: '',
         severity: 5,
         notes: '',
-        loggedAt: new Date().toISOString().slice(0, 16),
+        loggedAt: now.toISOString().slice(0, 16),
       });
       setApiError(null);
       setSuccessMessage(null);
@@ -84,11 +89,20 @@ export function SymptomLogModal({ isOpen, onClose, onSuccess }: SymptomLogModalP
     setSuccessMessage(null);
 
     try {
+      // Round to nearest 15-minute interval
+      let loggedAt: string | undefined;
+      if (data.loggedAt) {
+        const date = new Date(data.loggedAt);
+        const minutes = Math.round(date.getMinutes() / 15) * 15;
+        date.setMinutes(minutes, 0, 0);
+        loggedAt = date.toISOString();
+      }
+
       await symptomsService.createSymptomLog({
         symptomId: data.symptomId,
         severity: data.severity,
         notes: data.notes || undefined,
-        loggedAt: data.loggedAt ? new Date(data.loggedAt).toISOString() : undefined,
+        loggedAt,
       });
 
       setSuccessMessage('Symptom logged successfully!');
