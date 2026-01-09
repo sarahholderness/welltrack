@@ -1,57 +1,59 @@
 import { useAuth } from '../context/AuthContext';
 
 export function DashboardPage() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
 
-  const handleLogout = async () => {
-    await logout();
+  const greeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    return 'Good evening';
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-xl font-bold text-primary-600">WellTrack</h1>
-          <div className="flex items-center gap-4">
-            <span className="text-gray-600">
-              {user?.displayName || user?.email}
-            </span>
-            <button
-              onClick={handleLogout}
-              className="text-sm text-gray-500 hover:text-gray-700"
-            >
-              Sign out
-            </button>
-          </div>
-        </div>
-      </header>
+    <div className="space-y-6">
+      {/* Greeting */}
+      <div>
+        <h1 className="text-2xl font-semibold text-gray-900">
+          {greeting()}, {user?.displayName || 'there'}!
+        </h1>
+        <p className="text-gray-600 mt-1">
+          {new Date().toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          })}
+        </p>
+      </div>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">Welcome to WellTrack!</h2>
-          <p className="text-gray-600 mb-6">
-            This is your dashboard. The full dashboard will be implemented in task 2.5.
-          </p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-primary-50 p-4 rounded-lg text-center">
-              <div className="text-primary-600 font-semibold">Symptoms</div>
-              <div className="text-gray-500 text-sm">Log symptoms</div>
-            </div>
-            <div className="bg-secondary-50 p-4 rounded-lg text-center">
-              <div className="text-secondary-600 font-semibold">Mood</div>
-              <div className="text-gray-500 text-sm">Track mood</div>
-            </div>
-            <div className="bg-blue-50 p-4 rounded-lg text-center">
-              <div className="text-blue-600 font-semibold">Medications</div>
-              <div className="text-gray-500 text-sm">Log meds</div>
-            </div>
-            <div className="bg-purple-50 p-4 rounded-lg text-center">
-              <div className="text-purple-600 font-semibold">Habits</div>
-              <div className="text-gray-500 text-sm">Track habits</div>
-            </div>
-          </div>
-        </div>
-      </main>
+      {/* Today's Summary placeholder */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Today's Summary</h2>
+        <p className="text-gray-500 text-sm">
+          Full dashboard will be implemented in task 2.5.
+        </p>
+      </div>
+
+      {/* Quick add buttons */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <button className="bg-primary-50 hover:bg-primary-100 p-4 rounded-lg text-center transition-colors">
+          <div className="text-primary-600 font-semibold">Symptoms</div>
+          <div className="text-gray-500 text-sm">Log symptoms</div>
+        </button>
+        <button className="bg-secondary-50 hover:bg-secondary-100 p-4 rounded-lg text-center transition-colors">
+          <div className="text-secondary-600 font-semibold">Mood</div>
+          <div className="text-gray-500 text-sm">Track mood</div>
+        </button>
+        <button className="bg-blue-50 hover:bg-blue-100 p-4 rounded-lg text-center transition-colors">
+          <div className="text-blue-600 font-semibold">Medications</div>
+          <div className="text-gray-500 text-sm">Log meds</div>
+        </button>
+        <button className="bg-purple-50 hover:bg-purple-100 p-4 rounded-lg text-center transition-colors">
+          <div className="text-purple-600 font-semibold">Habits</div>
+          <div className="text-gray-500 text-sm">Track habits</div>
+        </button>
+      </div>
     </div>
   );
 }

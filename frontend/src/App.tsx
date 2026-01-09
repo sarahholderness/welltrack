@@ -1,12 +1,16 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context';
-import { ProtectedRoute, PublicRoute } from './components';
+import { ProtectedRoute, PublicRoute, AppLayout } from './components';
 import {
   LoginPage,
   RegisterPage,
   ForgotPasswordPage,
   ResetPasswordPage,
   DashboardPage,
+  LogPage,
+  HistoryPage,
+  TrendsPage,
+  SettingsPage,
 } from './pages';
 
 function App() {
@@ -48,15 +52,20 @@ function App() {
             }
           />
 
-          {/* Protected routes - require authentication */}
+          {/* Protected routes - require authentication, wrapped in AppLayout */}
           <Route
-            path="/dashboard"
             element={
               <ProtectedRoute>
-                <DashboardPage />
+                <AppLayout />
               </ProtectedRoute>
             }
-          />
+          >
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/log" element={<LogPage />} />
+            <Route path="/history" element={<HistoryPage />} />
+            <Route path="/trends" element={<TrendsPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+          </Route>
 
           {/* Default redirect */}
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
