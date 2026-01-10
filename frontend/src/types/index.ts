@@ -115,3 +115,20 @@ export interface ApiError {
     message: string;
   }>;
 }
+
+// User stats types
+export interface UserStats {
+  averageMoodScore: number | null;
+  topSymptoms: Array<{
+    symptomId: string;
+    symptomName: string;
+    count: number;
+  }>;
+  currentStreak: number;
+  totalLogs: {
+    symptoms: number;
+    moods: number;
+    medications: number;
+    habits: number;
+  };
+}
