@@ -195,49 +195,52 @@ export function SymptomLogModal({ isOpen, onClose, onSuccess }: SymptomLogModalP
             name="loggedAt"
             control={control}
             render={({ field: { value, onChange } }) => {
-              const date = value ? new Date(value) : new Date();
-              const dateStr = date.toISOString().split('T')[0];
-              const hours24 = date.getHours();
+              // Parse the value (format: YYYY-MM-DDTHH:mm) without timezone conversion
+              const [datePart, timePart] = (value || '').split('T');
+              const [hourStr, minuteStr] = (timePart || '00:00').split(':');
+              const hours24 = parseInt(hourStr, 10) || 0;
+              const storedMinutes = parseInt(minuteStr, 10) || 0;
               const hours12 = hours24 === 0 ? 12 : hours24 > 12 ? hours24 - 12 : hours24;
-              const minutes = Math.floor(date.getMinutes() / 15) * 15;
+              const minutes = Math.floor(storedMinutes / 15) * 15;
               const period = hours24 >= 12 ? 'PM' : 'AM';
 
+              const buildValue = (newDate: string, h24: number, m: number) => {
+                const hh = h24.toString().padStart(2, '0');
+                const mm = m.toString().padStart(2, '0');
+                return `${newDate}T${hh}:${mm}`;
+              };
+
               const handleDateChange = (newDate: string) => {
-                const updated = new Date(value || new Date());
-                const [year, month, day] = newDate.split('-').map(Number);
-                updated.setFullYear(year, month - 1, day);
-                onChange(updated.toISOString().slice(0, 16));
+                onChange(buildValue(newDate, hours24, minutes));
               };
 
               const handleTimeChange = (newHours12: number, newMinutes: number, newPeriod: string) => {
-                const updated = new Date(value || new Date());
-                let hours24Val = newHours12;
+                let h24 = newHours12;
                 if (newPeriod === 'AM') {
-                  hours24Val = newHours12 === 12 ? 0 : newHours12;
+                  h24 = newHours12 === 12 ? 0 : newHours12;
                 } else {
-                  hours24Val = newHours12 === 12 ? 12 : newHours12 + 12;
+                  h24 = newHours12 === 12 ? 12 : newHours12 + 12;
                 }
-                updated.setHours(hours24Val, newMinutes, 0, 0);
-                onChange(updated.toISOString().slice(0, 16));
+                onChange(buildValue(datePart, h24, newMinutes));
               };
 
               return (
-                <div className="space-y-2">
+                <div className="space-y-1">
                   <label className="block text-sm font-medium text-gray-700">
                     Date & Time
                   </label>
-                  <input
-                    type="date"
-                    value={dateStr}
-                    onChange={(e) => handleDateChange(e.target.value)}
-                    className="block w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900
-                      focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                  />
                   <div className="flex gap-2 items-center">
+                    <input
+                      type="date"
+                      value={datePart}
+                      onChange={(e) => handleDateChange(e.target.value)}
+                      className="flex-1 min-w-0 px-2 py-2 border border-gray-300 rounded-lg text-gray-900
+                        focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    />
                     <select
                       value={hours12}
                       onChange={(e) => handleTimeChange(parseInt(e.target.value, 10), minutes, period)}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-gray-900
+                      className="w-16 px-2 py-2 border border-gray-300 rounded-lg text-gray-900
                         focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     >
                       {[12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((h) => (
@@ -250,7 +253,7 @@ export function SymptomLogModal({ isOpen, onClose, onSuccess }: SymptomLogModalP
                     <select
                       value={minutes}
                       onChange={(e) => handleTimeChange(hours12, parseInt(e.target.value, 10), period)}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-gray-900
+                      className="w-16 px-2 py-2 border border-gray-300 rounded-lg text-gray-900
                         focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     >
                       <option value={0}>00</option>
@@ -262,7 +265,7 @@ export function SymptomLogModal({ isOpen, onClose, onSuccess }: SymptomLogModalP
                       <button
                         type="button"
                         onClick={() => handleTimeChange(hours12, minutes, 'AM')}
-                        className={`px-3 py-2 text-sm font-medium transition-colors ${
+                        className={`px-2 py-2 text-sm font-medium transition-colors ${
                           period === 'AM'
                             ? 'bg-primary-500 text-white'
                             : 'bg-white text-gray-700 hover:bg-gray-50'
@@ -273,7 +276,7 @@ export function SymptomLogModal({ isOpen, onClose, onSuccess }: SymptomLogModalP
                       <button
                         type="button"
                         onClick={() => handleTimeChange(hours12, minutes, 'PM')}
-                        className={`px-3 py-2 text-sm font-medium transition-colors ${
+                        className={`px-2 py-2 text-sm font-medium transition-colors ${
                           period === 'PM'
                             ? 'bg-primary-500 text-white'
                             : 'bg-white text-gray-700 hover:bg-gray-50'
