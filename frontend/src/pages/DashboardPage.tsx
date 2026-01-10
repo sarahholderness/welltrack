@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useDashboard } from '../hooks';
-import { SymptomLogModal } from '../components/logging';
+import { SymptomLogModal, MoodLogModal } from '../components/logging';
 import {
   HeartPulseIcon,
   SmileIcon,
@@ -17,6 +17,7 @@ export function DashboardPage() {
   const { user } = useAuth();
   const { summary, weekActivity, isLoading, error, refresh } = useDashboard();
   const [symptomModalOpen, setSymptomModalOpen] = useState(false);
+  const [moodModalOpen, setMoodModalOpen] = useState(false);
 
   const greeting = () => {
     const hour = new Date().getHours();
@@ -125,7 +126,7 @@ export function DashboardPage() {
           </button>
 
           <button
-            onClick={() => navigate('/log', { state: { tab: 'mood' } })}
+            onClick={() => setMoodModalOpen(true)}
             className="bg-white hover:bg-secondary-50 border border-gray-200 hover:border-secondary-200 p-4 rounded-lg text-left transition-colors group"
           >
             <div className="w-10 h-10 bg-secondary-100 group-hover:bg-secondary-200 rounded-lg flex items-center justify-center mb-3 transition-colors">
@@ -295,6 +296,16 @@ export function DashboardPage() {
         onClose={() => setSymptomModalOpen(false)}
         onSuccess={() => {
           setSymptomModalOpen(false);
+          refresh();
+        }}
+      />
+
+      {/* Mood Log Modal */}
+      <MoodLogModal
+        isOpen={moodModalOpen}
+        onClose={() => setMoodModalOpen(false)}
+        onSuccess={() => {
+          setMoodModalOpen(false);
           refresh();
         }}
       />

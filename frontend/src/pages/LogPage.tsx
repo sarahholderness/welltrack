@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { SymptomLogModal } from '../components/logging';
+import { SymptomLogModal, MoodLogModal } from '../components/logging';
 import {
   HeartPulseIcon,
   SmileIcon,
@@ -17,6 +17,7 @@ export function LogPage() {
 
   const [activeTab, setActiveTab] = useState<LogTab>(initialTab);
   const [symptomModalOpen, setSymptomModalOpen] = useState(initialTab === 'symptoms');
+  const [moodModalOpen, setMoodModalOpen] = useState(initialTab === 'mood');
 
   const handleSymptomSuccess = () => {
     // Navigate to dashboard to see the updated summary
@@ -56,8 +57,14 @@ export function LogPage() {
     setActiveTab(tabId);
     if (tabId === 'symptoms') {
       setSymptomModalOpen(true);
+    } else if (tabId === 'mood') {
+      setMoodModalOpen(true);
     }
     // Future: open respective modals for other tabs
+  };
+
+  const handleMoodSuccess = () => {
+    navigate('/dashboard');
   };
 
   return (
@@ -108,8 +115,14 @@ export function LogPage() {
             <SmileIcon className="w-12 h-12 mx-auto text-secondary-400 mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">Log Your Mood</h3>
             <p className="text-gray-500 mb-4">
-              Mood logging will be implemented in task 2.7.
+              Track your mood, energy, and stress levels to identify patterns over time.
             </p>
+            <button
+              onClick={() => setMoodModalOpen(true)}
+              className="px-4 py-2 bg-secondary-600 text-white rounded-lg hover:bg-secondary-700 transition-colors"
+            >
+              Add Mood Entry
+            </button>
           </div>
         )}
 
@@ -139,6 +152,13 @@ export function LogPage() {
         isOpen={symptomModalOpen}
         onClose={() => setSymptomModalOpen(false)}
         onSuccess={handleSymptomSuccess}
+      />
+
+      {/* Mood Log Modal */}
+      <MoodLogModal
+        isOpen={moodModalOpen}
+        onClose={() => setMoodModalOpen(false)}
+        onSuccess={handleMoodSuccess}
       />
     </div>
   );
