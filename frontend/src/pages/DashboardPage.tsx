@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useDashboard } from '../hooks';
+import { useDashboard, useUserStats } from '../hooks';
 import { SymptomLogModal, MoodLogModal } from '../components/logging';
 import {
   HeartPulseIcon,
@@ -10,12 +10,14 @@ import {
   ActivityIcon,
   CalendarIcon,
   RefreshIcon,
+  TrendingUpIcon,
 } from '../components/icons';
 
 export function DashboardPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { summary, weekActivity, isLoading, error, refresh } = useDashboard();
+  const { stats, isLoading: statsLoading, error: statsError, refresh: refreshStats } = useUserStats();
   const [symptomModalOpen, setSymptomModalOpen] = useState(false);
   const [moodModalOpen, setMoodModalOpen] = useState(false);
 
@@ -107,6 +109,101 @@ export function DashboardPage() {
           </div>
         </div>
       )}
+
+      {/* Your Stats Card */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <TrendingUpIcon className="w-5 h-5 text-primary-600" />
+            <h2 className="text-lg font-semibold text-gray-900">Your Stats</h2>
+          </div>
+          <button
+            onClick={refreshStats}
+            disabled={statsLoading}
+            className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors disabled:opacity-50"
+            aria-label="Refresh stats"
+          >
+            <RefreshIcon className={`w-4 h-4 ${statsLoading ? 'animate-spin' : ''}`} />
+          </button>
+        </div>
+
+        {statsError && (
+          <div className="p-4">
+            <div className="bg-red-50 text-red-700 p-3 rounded-lg text-sm">
+              {statsError}
+              <button onClick={refreshStats} className="ml-2 underline">
+                Try again
+              </button>
+            </div>
+          </div>
+        )}
+
+        {statsLoading ? (
+          <div className="p-6">
+            <div className="flex items-center justify-center gap-2 text-gray-500">
+              <RefreshIcon className="w-5 h-5 animate-spin" />
+              <span>Loading stats...</span>
+            </div>
+          </div>
+        ) : stats ? (
+          <div className="p-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {/* Average Mood */}
+              <div className="text-center p-3 bg-secondary-50 rounded-lg">
+                <div className="text-2xl font-bold text-secondary-600">
+                  {stats.averageMoodScore !== null ? stats.averageMoodScore.toFixed(1) : '--'}
+                </div>
+                <div className="text-xs text-gray-500 mt-1">Avg Mood (30d)</div>
+              </div>
+
+              {/* Current Streak */}
+              <div className="text-center p-3 bg-primary-50 rounded-lg">
+                <div className="text-2xl font-bold text-primary-600">
+                  {stats.currentStreak}
+                </div>
+                <div className="text-xs text-gray-500 mt-1">Day Streak</div>
+              </div>
+
+              {/* Total Logs */}
+              <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <div className="text-2xl font-bold text-gray-700">
+                  {stats.totalLogs.symptoms + stats.totalLogs.moods + stats.totalLogs.medications + stats.totalLogs.habits}
+                </div>
+                <div className="text-xs text-gray-500 mt-1">Total Logs</div>
+              </div>
+
+              {/* Log Breakdown */}
+              <div className="text-center p-3 bg-blue-50 rounded-lg">
+                <div className="flex justify-center gap-2 text-sm font-medium text-blue-600">
+                  <span title="Symptoms">{stats.totalLogs.symptoms}S</span>
+                  <span title="Moods">{stats.totalLogs.moods}M</span>
+                  <span title="Meds">{stats.totalLogs.medications}R</span>
+                  <span title="Habits">{stats.totalLogs.habits}H</span>
+                </div>
+                <div className="text-xs text-gray-500 mt-1">By Type</div>
+              </div>
+            </div>
+
+            {/* Top Symptoms */}
+            {stats.topSymptoms.length > 0 && (
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <div className="text-sm font-medium text-gray-700 mb-2">Top Symptoms (30 days)</div>
+                <div className="flex flex-wrap gap-2">
+                  {stats.topSymptoms.map((symptom) => (
+                    <span
+                      key={symptom.symptomId}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 bg-primary-100 text-primary-700 rounded-full text-sm"
+                    >
+                      {symptom.symptomName}
+                      <span className="text-primary-500 text-xs">({symptom.count})</span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        ) : null}
+      </div>
 
       {/* Quick Add Buttons */}
       <div>

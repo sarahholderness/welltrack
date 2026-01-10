@@ -7,3 +7,4 @@ export { symptomsService } from './symptoms';
 export type { CreateSymptomLogData } from './symptoms';
 export { moodService } from './mood';
 export type { CreateMoodLogData, MoodLogsResponse } from './mood';
+export { userStatsService } from './userStats';
