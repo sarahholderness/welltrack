@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyAccessToken, TokenPayload } from '../utils/jwt';
+import { AppError, ErrorCode } from '../errors';
 
 export interface AuthRequest extends Request {
   user?: TokenPayload;
@@ -7,13 +8,13 @@ export interface AuthRequest extends Request {
 
 export function authMiddleware(
   req: AuthRequest,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): void {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    res.status(401).json({ error: 'No token provided' });
+    next(new AppError(401, 'No token provided', ErrorCode.NO_TOKEN_PROVIDED));
     return;
   }
 
@@ -24,6 +25,6 @@ export function authMiddleware(
     req.user = payload;
     next();
   } catch {
-    res.status(401).json({ error: 'Invalid or expired token' });
+    next(new AppError(401, 'Invalid or expired token', ErrorCode.INVALID_TOKEN));
   }
 }

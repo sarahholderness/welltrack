@@ -10,7 +10,7 @@ import {
   forgotPasswordSchema,
   resetPasswordSchema,
 } from '../validators/auth';
-import { ZodError } from 'zod';
+import { AppError, ErrorCode } from '../errors';
 
 const router = Router();
 
@@ -31,17 +31,6 @@ function formatUserResponse(user: {
   };
 }
 
-// Helper to handle Zod validation errors
-function handleZodError(error: ZodError, res: Response): void {
-  res.status(400).json({
-    error: 'Validation failed',
-    details: error.issues.map((issue) => ({
-      field: issue.path.join('.'),
-      message: issue.message,
-    })),
-  });
-}
-
 // POST /api/auth/register
 router.post(
   '/register',
@@ -54,8 +43,7 @@ router.post(
       });
 
       if (existingUser) {
-        res.status(409).json({ error: 'Email already registered' });
-        return;
+        throw new AppError(409, 'Email already registered', ErrorCode.EMAIL_ALREADY_EXISTS);
       }
 
       const passwordHash = await hashPassword(data.password);
@@ -75,10 +63,6 @@ router.post(
         ...tokens,
       });
     } catch (error) {
-      if (error instanceof ZodError) {
-        handleZodError(error, res);
-        return;
-      }
       next(error);
     }
   }
@@ -96,8 +80,7 @@ router.post(
       });
 
       if (!user) {
-        res.status(401).json({ error: 'Invalid email or password' });
-        return;
+        throw new AppError(401, 'Invalid email or password', ErrorCode.INVALID_CREDENTIALS);
       }
 
       const isValidPassword = await verifyPassword(
@@ -106,8 +89,7 @@ router.post(
       );
 
       if (!isValidPassword) {
-        res.status(401).json({ error: 'Invalid email or password' });
-        return;
+        throw new AppError(401, 'Invalid email or password', ErrorCode.INVALID_CREDENTIALS);
       }
 
       const tokens = generateTokens({ userId: user.id, email: user.email });
@@ -117,10 +99,6 @@ router.post(
         ...tokens,
       });
     } catch (error) {
-      if (error instanceof ZodError) {
-        handleZodError(error, res);
-        return;
-      }
       next(error);
     }
   }
@@ -137,8 +115,7 @@ router.post(
       try {
         payload = verifyRefreshToken(data.refreshToken);
       } catch {
-        res.status(401).json({ error: 'Invalid or expired refresh token' });
-        return;
+        throw new AppError(401, 'Invalid or expired refresh token', ErrorCode.INVALID_REFRESH_TOKEN);
       }
 
       // Verify user still exists
@@ -147,18 +124,13 @@ router.post(
       });
 
       if (!user) {
-        res.status(401).json({ error: 'User not found' });
-        return;
+        throw new AppError(401, 'User not found', ErrorCode.USER_NOT_FOUND);
       }
 
       const tokens = generateTokens({ userId: user.id, email: user.email });
 
       res.json(tokens);
     } catch (error) {
-      if (error instanceof ZodError) {
-        handleZodError(error, res);
-        return;
-      }
       next(error);
     }
   }
@@ -218,10 +190,6 @@ router.post(
           'If an account with that email exists, a password reset link has been sent',
       });
     } catch (error) {
-      if (error instanceof ZodError) {
-        handleZodError(error, res);
-        return;
-      }
       next(error);
     }
   }
@@ -240,8 +208,7 @@ router.post(
       });
 
       if (!resetToken) {
-        res.status(400).json({ error: 'Invalid or expired reset token' });
-        return;
+        throw new AppError(400, 'Invalid or expired reset token', ErrorCode.INVALID_RESET_TOKEN);
       }
 
       if (resetToken.expiresAt < new Date()) {
@@ -249,8 +216,7 @@ router.post(
         await prisma.passwordResetToken.delete({
           where: { id: resetToken.id },
         });
-        res.status(400).json({ error: 'Invalid or expired reset token' });
-        return;
+        throw new AppError(400, 'Invalid or expired reset token', ErrorCode.INVALID_RESET_TOKEN);
       }
 
       const passwordHash = await hashPassword(data.password);
@@ -268,10 +234,6 @@ router.post(
 
       res.json({ message: 'Password reset successfully' });
     } catch (error) {
-      if (error instanceof ZodError) {
-        handleZodError(error, res);
-        return;
-      }
       next(error);
     }
   }

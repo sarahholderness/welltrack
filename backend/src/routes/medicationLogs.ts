@@ -6,23 +6,12 @@ import {
   updateMedicationLogSchema,
   getMedicationLogsQuerySchema,
 } from '../validators/medicationLog';
-import { ZodError } from 'zod';
+import { AppError, ErrorCode } from '../errors';
 
 const router = Router();
 
 // All medication log routes require authentication
 router.use(authMiddleware);
-
-// Helper to handle Zod validation errors
-function handleZodError(error: ZodError, res: Response): void {
-  res.status(400).json({
-    error: 'Validation failed',
-    details: error.issues.map((issue) => ({
-      field: issue.path.join('.'),
-      message: issue.message,
-    })),
-  });
-}
 
 // GET /api/medication-logs - return logs with date range filtering
 router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -85,10 +74,6 @@ router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
       },
     });
   } catch (error) {
-    if (error instanceof ZodError) {
-      handleZodError(error, res);
-      return;
-    }
     next(error);
   }
 });
@@ -105,13 +90,11 @@ router.post('/', async (req: AuthRequest, res: Response, next: NextFunction) => 
     });
 
     if (!medication) {
-      res.status(404).json({ error: 'Medication not found' });
-      return;
+      throw new AppError(404, 'Medication not found', ErrorCode.MEDICATION_NOT_FOUND);
     }
 
     if (medication.userId !== userId) {
-      res.status(403).json({ error: "Cannot log another user's medication" });
-      return;
+      throw new AppError(403, "Cannot log another user's medication", ErrorCode.CANNOT_LOG_OTHER_USER);
     }
 
     const log = await prisma.medicationLog.create({
@@ -136,10 +119,6 @@ router.post('/', async (req: AuthRequest, res: Response, next: NextFunction) => 
 
     res.status(201).json({ log });
   } catch (error) {
-    if (error instanceof ZodError) {
-      handleZodError(error, res);
-      return;
-    }
     next(error);
   }
 });
@@ -153,8 +132,7 @@ router.patch('/:id', async (req: AuthRequest, res: Response, next: NextFunction)
 
     // Check if there's anything to update
     if (Object.keys(data).length === 0) {
-      res.status(400).json({ error: 'No fields to update' });
-      return;
+      throw new AppError(400, 'No fields to update', ErrorCode.NO_FIELDS_TO_UPDATE);
     }
 
     // Find the log
@@ -163,14 +141,12 @@ router.patch('/:id', async (req: AuthRequest, res: Response, next: NextFunction)
     });
 
     if (!existingLog) {
-      res.status(404).json({ error: 'Medication log not found' });
-      return;
+      throw new AppError(404, 'Medication log not found', ErrorCode.MEDICATION_LOG_NOT_FOUND);
     }
 
     // Check ownership
     if (existingLog.userId !== userId) {
-      res.status(403).json({ error: "Cannot modify another user's log" });
-      return;
+      throw new AppError(403, "Cannot modify another user's log", ErrorCode.CANNOT_MODIFY_OTHER_USER);
     }
 
     const log = await prisma.medicationLog.update({
@@ -196,10 +172,6 @@ router.patch('/:id', async (req: AuthRequest, res: Response, next: NextFunction)
 
     res.json({ log });
   } catch (error) {
-    if (error instanceof ZodError) {
-      handleZodError(error, res);
-      return;
-    }
     next(error);
   }
 });
@@ -216,14 +188,12 @@ router.delete('/:id', async (req: AuthRequest, res: Response, next: NextFunction
     });
 
     if (!existingLog) {
-      res.status(404).json({ error: 'Medication log not found' });
-      return;
+      throw new AppError(404, 'Medication log not found', ErrorCode.MEDICATION_LOG_NOT_FOUND);
     }
 
     // Check ownership
     if (existingLog.userId !== userId) {
-      res.status(403).json({ error: "Cannot delete another user's log" });
-      return;
+      throw new AppError(403, "Cannot delete another user's log", ErrorCode.CANNOT_DELETE_OTHER_USER);
     }
 
     await prisma.medicationLog.delete({

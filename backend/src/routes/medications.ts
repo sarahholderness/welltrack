@@ -2,23 +2,12 @@ import { Router, Response, NextFunction } from 'express';
 import { prisma } from '../lib/prisma';
 import { authMiddleware, AuthRequest } from '../middleware/auth';
 import { createMedicationSchema, updateMedicationSchema } from '../validators/medication';
-import { ZodError } from 'zod';
+import { AppError, ErrorCode } from '../errors';
 
 const router = Router();
 
 // All medication routes require authentication
 router.use(authMiddleware);
-
-// Helper to handle Zod validation errors
-function handleZodError(error: ZodError, res: Response): void {
-  res.status(400).json({
-    error: 'Validation failed',
-    details: error.issues.map((issue) => ({
-      field: issue.path.join('.'),
-      message: issue.message,
-    })),
-  });
-}
 
 // GET /api/medications - return user's medications
 router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -56,10 +45,6 @@ router.post('/', async (req: AuthRequest, res: Response, next: NextFunction) => 
 
     res.status(201).json({ medication });
   } catch (error) {
-    if (error instanceof ZodError) {
-      handleZodError(error, res);
-      return;
-    }
     next(error);
   }
 });
@@ -73,8 +58,7 @@ router.patch('/:id', async (req: AuthRequest, res: Response, next: NextFunction)
 
     // Check if there's anything to update
     if (Object.keys(data).length === 0) {
-      res.status(400).json({ error: 'No fields to update' });
-      return;
+      throw new AppError(400, 'No fields to update', ErrorCode.NO_FIELDS_TO_UPDATE);
     }
 
     // Find the medication
@@ -83,14 +67,12 @@ router.patch('/:id', async (req: AuthRequest, res: Response, next: NextFunction)
     });
 
     if (!existingMedication) {
-      res.status(404).json({ error: 'Medication not found' });
-      return;
+      throw new AppError(404, 'Medication not found', ErrorCode.MEDICATION_NOT_FOUND);
     }
 
     // Check ownership
     if (existingMedication.userId !== userId) {
-      res.status(403).json({ error: 'Cannot modify another user\'s medication' });
-      return;
+      throw new AppError(403, "Cannot modify another user's medication", ErrorCode.CANNOT_MODIFY_OTHER_USER);
     }
 
     const medication = await prisma.medication.update({
@@ -105,10 +87,6 @@ router.patch('/:id', async (req: AuthRequest, res: Response, next: NextFunction)
 
     res.json({ medication });
   } catch (error) {
-    if (error instanceof ZodError) {
-      handleZodError(error, res);
-      return;
-    }
     next(error);
   }
 });
@@ -125,14 +103,12 @@ router.delete('/:id', async (req: AuthRequest, res: Response, next: NextFunction
     });
 
     if (!existingMedication) {
-      res.status(404).json({ error: 'Medication not found' });
-      return;
+      throw new AppError(404, 'Medication not found', ErrorCode.MEDICATION_NOT_FOUND);
     }
 
     // Check ownership
     if (existingMedication.userId !== userId) {
-      res.status(403).json({ error: 'Cannot delete another user\'s medication' });
-      return;
+      throw new AppError(403, "Cannot delete another user's medication", ErrorCode.CANNOT_DELETE_OTHER_USER);
     }
 
     await prisma.medication.delete({
