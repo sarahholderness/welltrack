@@ -89,20 +89,11 @@ export function SymptomLogModal({ isOpen, onClose, onSuccess }: SymptomLogModalP
     setSuccessMessage(null);
 
     try {
-      // Round to nearest 15-minute interval
-      let loggedAt: string | undefined;
-      if (data.loggedAt) {
-        const date = new Date(data.loggedAt);
-        const minutes = Math.round(date.getMinutes() / 15) * 15;
-        date.setMinutes(minutes, 0, 0);
-        loggedAt = date.toISOString();
-      }
-
       await symptomsService.createSymptomLog({
         symptomId: data.symptomId,
         severity: data.severity,
         notes: data.notes || undefined,
-        loggedAt,
+        loggedAt: data.loggedAt ? new Date(data.loggedAt).toISOString() : undefined,
       });
 
       setSuccessMessage('Symptom logged successfully!');
@@ -203,23 +194,98 @@ export function SymptomLogModal({ isOpen, onClose, onSuccess }: SymptomLogModalP
           <Controller
             name="loggedAt"
             control={control}
-            render={({ field }) => (
-              <div className="space-y-1">
-                <label
-                  htmlFor="logged-at"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Date & Time
-                </label>
-                <input
-                  type="datetime-local"
-                  id="logged-at"
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900
-                    focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                  {...field}
-                />
-              </div>
-            )}
+            render={({ field: { value, onChange } }) => {
+              const date = value ? new Date(value) : new Date();
+              const dateStr = date.toISOString().split('T')[0];
+              const hours24 = date.getHours();
+              const hours12 = hours24 === 0 ? 12 : hours24 > 12 ? hours24 - 12 : hours24;
+              const minutes = Math.floor(date.getMinutes() / 15) * 15;
+              const period = hours24 >= 12 ? 'PM' : 'AM';
+
+              const handleDateChange = (newDate: string) => {
+                const updated = new Date(value || new Date());
+                const [year, month, day] = newDate.split('-').map(Number);
+                updated.setFullYear(year, month - 1, day);
+                onChange(updated.toISOString().slice(0, 16));
+              };
+
+              const handleTimeChange = (newHours12: number, newMinutes: number, newPeriod: string) => {
+                const updated = new Date(value || new Date());
+                let hours24Val = newHours12;
+                if (newPeriod === 'AM') {
+                  hours24Val = newHours12 === 12 ? 0 : newHours12;
+                } else {
+                  hours24Val = newHours12 === 12 ? 12 : newHours12 + 12;
+                }
+                updated.setHours(hours24Val, newMinutes, 0, 0);
+                onChange(updated.toISOString().slice(0, 16));
+              };
+
+              return (
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Date & Time
+                  </label>
+                  <input
+                    type="date"
+                    value={dateStr}
+                    onChange={(e) => handleDateChange(e.target.value)}
+                    className="block w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900
+                      focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  />
+                  <div className="flex gap-2 items-center">
+                    <select
+                      value={hours12}
+                      onChange={(e) => handleTimeChange(parseInt(e.target.value, 10), minutes, period)}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-gray-900
+                        focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    >
+                      {[12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((h) => (
+                        <option key={h} value={h}>
+                          {h}
+                        </option>
+                      ))}
+                    </select>
+                    <span className="text-gray-500 font-medium">:</span>
+                    <select
+                      value={minutes}
+                      onChange={(e) => handleTimeChange(hours12, parseInt(e.target.value, 10), period)}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-gray-900
+                        focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    >
+                      <option value={0}>00</option>
+                      <option value={15}>15</option>
+                      <option value={30}>30</option>
+                      <option value={45}>45</option>
+                    </select>
+                    <div className="flex rounded-lg border border-gray-300 overflow-hidden">
+                      <button
+                        type="button"
+                        onClick={() => handleTimeChange(hours12, minutes, 'AM')}
+                        className={`px-3 py-2 text-sm font-medium transition-colors ${
+                          period === 'AM'
+                            ? 'bg-primary-500 text-white'
+                            : 'bg-white text-gray-700 hover:bg-gray-50'
+                        }`}
+                      >
+                        AM
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleTimeChange(hours12, minutes, 'PM')}
+                        className={`px-3 py-2 text-sm font-medium transition-colors ${
+                          period === 'PM'
+                            ? 'bg-primary-500 text-white'
+                            : 'bg-white text-gray-700 hover:bg-gray-50'
+                        }`}
+                      >
+                        PM
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            }}
           />
 
           {/* Submit button */}
