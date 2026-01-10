@@ -153,6 +153,9 @@ export function DashboardPage() {
                 <div className="text-2xl font-bold text-secondary-600">
                   {stats.averageMoodScore !== null ? stats.averageMoodScore.toFixed(1) : '--'}
                 </div>
+                {stats.averageMoodScore !== null && (
+                  <div className="text-lg mt-0.5">{getMoodEmoji(Math.round(stats.averageMoodScore))}</div>
+                )}
                 <div className="text-xs text-gray-500 mt-1">Avg Mood (30d)</div>
               </div>
 
