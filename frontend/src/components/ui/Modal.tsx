@@ -28,7 +28,7 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
       // Wait for animation to complete before unmounting
       const timer = setTimeout(() => {
         setShouldRender(false);
-      }, 200);
+      }, 300);
       return () => clearTimeout(timer);
     }
   }, [isOpen]);
@@ -65,7 +65,7 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
     <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 bg-black transition-opacity duration-200 ease-out ${
+        className={`fixed inset-0 bg-black transition-opacity duration-300 ease-out ${
           isAnimating ? 'opacity-50' : 'opacity-0'
         }`}
         onClick={onClose}
@@ -80,10 +80,10 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
           aria-modal="true"
           aria-labelledby="modal-title"
           tabIndex={-1}
-          className={`relative w-full max-w-lg bg-white rounded-t-2xl sm:rounded-2xl shadow-xl transition-all duration-200 ease-out ${
+          className={`relative w-full max-w-lg bg-white rounded-t-2xl sm:rounded-2xl shadow-xl transition-all duration-300 ease-out ${
             isAnimating
               ? 'opacity-100 translate-y-0 scale-100'
-              : 'opacity-0 translate-y-4 scale-95'
+              : 'opacity-0 translate-y-8 scale-95'
           }`}
         >
           {/* Header */}
