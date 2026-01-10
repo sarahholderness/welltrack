@@ -2,8 +2,8 @@ import { Router, Response, NextFunction } from 'express';
 import { prisma } from '../lib/prisma';
 import { authMiddleware, AuthRequest } from '../middleware/auth';
 import { updateUserSchema } from '../validators/user';
-import { ZodError } from 'zod';
 import { getUserStats } from '../services/userStats';
+import { AppError, ErrorCode } from '../errors';
 
 const router = Router();
 
@@ -35,8 +35,7 @@ router.get('/me', async (req: AuthRequest, res: Response, next: NextFunction) =>
     });
 
     if (!user) {
-      res.status(404).json({ error: 'User not found' });
-      return;
+      throw new AppError(404, 'User not found', ErrorCode.USER_NOT_FOUND);
     }
 
     res.json({ user: formatUserResponse(user) });
@@ -64,8 +63,7 @@ router.patch(
 
       // Check if there's anything to update
       if (!data.displayName && !data.timezone) {
-        res.status(400).json({ error: 'No fields to update' });
-        return;
+        throw new AppError(400, 'No fields to update', ErrorCode.NO_FIELDS_TO_UPDATE);
       }
 
       const user = await prisma.user.update({
@@ -78,16 +76,6 @@ router.patch(
 
       res.json({ user: formatUserResponse(user) });
     } catch (error) {
-      if (error instanceof ZodError) {
-        res.status(400).json({
-          error: 'Validation failed',
-          details: error.issues.map((issue) => ({
-            field: issue.path.join('.'),
-            message: issue.message,
-          })),
-        });
-        return;
-      }
       next(error);
     }
   }

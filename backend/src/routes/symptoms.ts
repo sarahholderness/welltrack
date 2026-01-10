@@ -2,23 +2,12 @@ import { Router, Response, NextFunction } from 'express';
 import { prisma } from '../lib/prisma';
 import { authMiddleware, AuthRequest } from '../middleware/auth';
 import { createSymptomSchema, updateSymptomSchema } from '../validators/symptom';
-import { ZodError } from 'zod';
+import { AppError, ErrorCode } from '../errors';
 
 const router = Router();
 
 // All symptom routes require authentication
 router.use(authMiddleware);
-
-// Helper to handle Zod validation errors
-function handleZodError(error: ZodError, res: Response): void {
-  res.status(400).json({
-    error: 'Validation failed',
-    details: error.issues.map((issue) => ({
-      field: issue.path.join('.'),
-      message: issue.message,
-    })),
-  });
-}
 
 // GET /api/symptoms - return system defaults + user's custom symptoms
 router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -61,10 +50,6 @@ router.post('/', async (req: AuthRequest, res: Response, next: NextFunction) => 
 
     res.status(201).json({ symptom });
   } catch (error) {
-    if (error instanceof ZodError) {
-      handleZodError(error, res);
-      return;
-    }
     next(error);
   }
 });
@@ -78,8 +63,7 @@ router.patch('/:id', async (req: AuthRequest, res: Response, next: NextFunction)
 
     // Check if there's anything to update
     if (Object.keys(data).length === 0) {
-      res.status(400).json({ error: 'No fields to update' });
-      return;
+      throw new AppError(400, 'No fields to update', ErrorCode.NO_FIELDS_TO_UPDATE);
     }
 
     // Find the symptom
@@ -88,19 +72,16 @@ router.patch('/:id', async (req: AuthRequest, res: Response, next: NextFunction)
     });
 
     if (!existingSymptom) {
-      res.status(404).json({ error: 'Symptom not found' });
-      return;
+      throw new AppError(404, 'Symptom not found', ErrorCode.SYMPTOM_NOT_FOUND);
     }
 
     // Check ownership - users can only modify their own symptoms, not system defaults
     if (existingSymptom.userId === null) {
-      res.status(403).json({ error: 'Cannot modify system default symptoms' });
-      return;
+      throw new AppError(403, 'Cannot modify system default symptoms', ErrorCode.CANNOT_MODIFY_SYSTEM_DEFAULT);
     }
 
     if (existingSymptom.userId !== userId) {
-      res.status(403).json({ error: 'Cannot modify another user\'s symptom' });
-      return;
+      throw new AppError(403, "Cannot modify another user's symptom", ErrorCode.CANNOT_MODIFY_OTHER_USER);
     }
 
     const symptom = await prisma.symptom.update({
@@ -114,10 +95,6 @@ router.patch('/:id', async (req: AuthRequest, res: Response, next: NextFunction)
 
     res.json({ symptom });
   } catch (error) {
-    if (error instanceof ZodError) {
-      handleZodError(error, res);
-      return;
-    }
     next(error);
   }
 });
@@ -134,20 +111,17 @@ router.delete('/:id', async (req: AuthRequest, res: Response, next: NextFunction
     });
 
     if (!existingSymptom) {
-      res.status(404).json({ error: 'Symptom not found' });
-      return;
+      throw new AppError(404, 'Symptom not found', ErrorCode.SYMPTOM_NOT_FOUND);
     }
 
     // Prevent deleting system defaults
     if (existingSymptom.userId === null) {
-      res.status(403).json({ error: 'Cannot delete system default symptoms' });
-      return;
+      throw new AppError(403, 'Cannot delete system default symptoms', ErrorCode.CANNOT_MODIFY_SYSTEM_DEFAULT);
     }
 
     // Check ownership
     if (existingSymptom.userId !== userId) {
-      res.status(403).json({ error: 'Cannot delete another user\'s symptom' });
-      return;
+      throw new AppError(403, "Cannot delete another user's symptom", ErrorCode.CANNOT_DELETE_OTHER_USER);
     }
 
     await prisma.symptom.delete({

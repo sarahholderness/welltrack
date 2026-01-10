@@ -6,23 +6,12 @@ import {
   updateHabitLogSchema,
   getHabitLogsQuerySchema,
 } from '../validators/habitLog';
-import { ZodError } from 'zod';
+import { AppError, ErrorCode } from '../errors';
 
 const router = Router();
 
 // All habit log routes require authentication
 router.use(authMiddleware);
-
-// Helper to handle Zod validation errors
-function handleZodError(error: ZodError, res: Response): void {
-  res.status(400).json({
-    error: 'Validation failed',
-    details: error.issues.map((issue) => ({
-      field: issue.path.join('.'),
-      message: issue.message,
-    })),
-  });
-}
 
 // GET /api/habit-logs - return logs with date range filtering
 router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -85,10 +74,6 @@ router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
       },
     });
   } catch (error) {
-    if (error instanceof ZodError) {
-      handleZodError(error, res);
-      return;
-    }
     next(error);
   }
 });
@@ -105,14 +90,12 @@ router.post('/', async (req: AuthRequest, res: Response, next: NextFunction) => 
     });
 
     if (!habit) {
-      res.status(404).json({ error: 'Habit not found' });
-      return;
+      throw new AppError(404, 'Habit not found', ErrorCode.HABIT_NOT_FOUND);
     }
 
     // User can log system defaults (userId = null) or their own habits
     if (habit.userId !== null && habit.userId !== userId) {
-      res.status(403).json({ error: "Cannot log another user's habit" });
-      return;
+      throw new AppError(403, "Cannot log another user's habit", ErrorCode.CANNOT_LOG_OTHER_USER);
     }
 
     // Validate that the appropriate value field is provided based on tracking type
@@ -121,16 +104,13 @@ router.post('/', async (req: AuthRequest, res: Response, next: NextFunction) => 
     const hasDuration = data.valueDuration !== undefined;
 
     if (habit.trackingType === 'boolean' && !hasBoolean) {
-      res.status(400).json({ error: 'valueBoolean is required for boolean habits' });
-      return;
+      throw new AppError(400, 'valueBoolean is required for boolean habits', ErrorCode.VALUE_BOOLEAN_REQUIRED);
     }
     if (habit.trackingType === 'numeric' && !hasNumeric) {
-      res.status(400).json({ error: 'valueNumeric is required for numeric habits' });
-      return;
+      throw new AppError(400, 'valueNumeric is required for numeric habits', ErrorCode.VALUE_NUMERIC_REQUIRED);
     }
     if (habit.trackingType === 'duration' && !hasDuration) {
-      res.status(400).json({ error: 'valueDuration is required for duration habits' });
-      return;
+      throw new AppError(400, 'valueDuration is required for duration habits', ErrorCode.VALUE_DURATION_REQUIRED);
     }
 
     const log = await prisma.habitLog.create({
@@ -157,10 +137,6 @@ router.post('/', async (req: AuthRequest, res: Response, next: NextFunction) => 
 
     res.status(201).json({ log });
   } catch (error) {
-    if (error instanceof ZodError) {
-      handleZodError(error, res);
-      return;
-    }
     next(error);
   }
 });
@@ -174,8 +150,7 @@ router.patch('/:id', async (req: AuthRequest, res: Response, next: NextFunction)
 
     // Check if there's anything to update
     if (Object.keys(data).length === 0) {
-      res.status(400).json({ error: 'No fields to update' });
-      return;
+      throw new AppError(400, 'No fields to update', ErrorCode.NO_FIELDS_TO_UPDATE);
     }
 
     // Find the log
@@ -184,14 +159,12 @@ router.patch('/:id', async (req: AuthRequest, res: Response, next: NextFunction)
     });
 
     if (!existingLog) {
-      res.status(404).json({ error: 'Habit log not found' });
-      return;
+      throw new AppError(404, 'Habit log not found', ErrorCode.HABIT_LOG_NOT_FOUND);
     }
 
     // Check ownership
     if (existingLog.userId !== userId) {
-      res.status(403).json({ error: "Cannot modify another user's log" });
-      return;
+      throw new AppError(403, "Cannot modify another user's log", ErrorCode.CANNOT_MODIFY_OTHER_USER);
     }
 
     const log = await prisma.habitLog.update({
@@ -217,10 +190,6 @@ router.patch('/:id', async (req: AuthRequest, res: Response, next: NextFunction)
 
     res.json({ log });
   } catch (error) {
-    if (error instanceof ZodError) {
-      handleZodError(error, res);
-      return;
-    }
     next(error);
   }
 });
@@ -237,14 +206,12 @@ router.delete('/:id', async (req: AuthRequest, res: Response, next: NextFunction
     });
 
     if (!existingLog) {
-      res.status(404).json({ error: 'Habit log not found' });
-      return;
+      throw new AppError(404, 'Habit log not found', ErrorCode.HABIT_LOG_NOT_FOUND);
     }
 
     // Check ownership
     if (existingLog.userId !== userId) {
-      res.status(403).json({ error: "Cannot delete another user's log" });
-      return;
+      throw new AppError(403, "Cannot delete another user's log", ErrorCode.CANNOT_DELETE_OTHER_USER);
     }
 
     await prisma.habitLog.delete({

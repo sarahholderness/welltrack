@@ -2,24 +2,13 @@ import { Router, Response, NextFunction } from 'express';
 import { prisma } from '../lib/prisma';
 import { authMiddleware, AuthRequest } from '../middleware/auth';
 import { createHabitSchema, updateHabitSchema } from '../validators/habit';
-import { ZodError } from 'zod';
+import { AppError, ErrorCode } from '../errors';
 import { TrackingType } from '../generated/prisma/enums';
 
 const router = Router();
 
 // All habit routes require authentication
 router.use(authMiddleware);
-
-// Helper to handle Zod validation errors
-function handleZodError(error: ZodError, res: Response): void {
-  res.status(400).json({
-    error: 'Validation failed',
-    details: error.issues.map((issue) => ({
-      field: issue.path.join('.'),
-      message: issue.message,
-    })),
-  });
-}
 
 // GET /api/habits - return system defaults + user's custom habits
 router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -57,10 +46,6 @@ router.post('/', async (req: AuthRequest, res: Response, next: NextFunction) => 
 
     res.status(201).json({ habit });
   } catch (error) {
-    if (error instanceof ZodError) {
-      handleZodError(error, res);
-      return;
-    }
     next(error);
   }
 });
@@ -74,8 +59,7 @@ router.patch('/:id', async (req: AuthRequest, res: Response, next: NextFunction)
 
     // Check if there's anything to update
     if (Object.keys(data).length === 0) {
-      res.status(400).json({ error: 'No fields to update' });
-      return;
+      throw new AppError(400, 'No fields to update', ErrorCode.NO_FIELDS_TO_UPDATE);
     }
 
     // Find the habit
@@ -84,20 +68,17 @@ router.patch('/:id', async (req: AuthRequest, res: Response, next: NextFunction)
     });
 
     if (!existingHabit) {
-      res.status(404).json({ error: 'Habit not found' });
-      return;
+      throw new AppError(404, 'Habit not found', ErrorCode.HABIT_NOT_FOUND);
     }
 
     // Check if it's a system default (userId is null)
     if (existingHabit.userId === null) {
-      res.status(403).json({ error: 'Cannot modify system default habits' });
-      return;
+      throw new AppError(403, 'Cannot modify system default habits', ErrorCode.CANNOT_MODIFY_SYSTEM_DEFAULT);
     }
 
     // Check ownership
     if (existingHabit.userId !== userId) {
-      res.status(403).json({ error: "Cannot modify another user's habit" });
-      return;
+      throw new AppError(403, "Cannot modify another user's habit", ErrorCode.CANNOT_MODIFY_OTHER_USER);
     }
 
     const habit = await prisma.habit.update({
@@ -112,10 +93,6 @@ router.patch('/:id', async (req: AuthRequest, res: Response, next: NextFunction)
 
     res.json({ habit });
   } catch (error) {
-    if (error instanceof ZodError) {
-      handleZodError(error, res);
-      return;
-    }
     next(error);
   }
 });
@@ -132,20 +109,17 @@ router.delete('/:id', async (req: AuthRequest, res: Response, next: NextFunction
     });
 
     if (!existingHabit) {
-      res.status(404).json({ error: 'Habit not found' });
-      return;
+      throw new AppError(404, 'Habit not found', ErrorCode.HABIT_NOT_FOUND);
     }
 
     // Check if it's a system default (userId is null)
     if (existingHabit.userId === null) {
-      res.status(403).json({ error: 'Cannot delete system default habits' });
-      return;
+      throw new AppError(403, 'Cannot delete system default habits', ErrorCode.CANNOT_MODIFY_SYSTEM_DEFAULT);
     }
 
     // Check ownership
     if (existingHabit.userId !== userId) {
-      res.status(403).json({ error: "Cannot delete another user's habit" });
-      return;
+      throw new AppError(403, "Cannot delete another user's habit", ErrorCode.CANNOT_DELETE_OTHER_USER);
     }
 
     await prisma.habit.delete({

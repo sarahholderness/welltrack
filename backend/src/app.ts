@@ -1,4 +1,4 @@
-import express, { Express, Request, Response, NextFunction } from 'express';
+import express, { Express } from 'express';
 import cors from 'cors';
 import healthRouter from './routes/health';
 import authRouter from './routes/auth';
@@ -10,6 +10,7 @@ import medicationsRouter from './routes/medications';
 import medicationLogsRouter from './routes/medicationLogs';
 import habitsRouter from './routes/habits';
 import habitLogsRouter from './routes/habitLogs';
+import { errorHandler, notFoundHandler } from './errors';
 
 const app: Express = express();
 
@@ -30,14 +31,9 @@ app.use('/api/habits', habitsRouter);
 app.use('/api/habit-logs', habitLogsRouter);
 
 // 404 handler
-app.use((_req: Request, res: Response) => {
-  res.status(404).json({ error: 'Not found' });
-});
+app.use(notFoundHandler);
 
 // Error handler
-app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Internal server error' });
-});
+app.use(errorHandler);
 
 export default app;
