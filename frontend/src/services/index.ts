@@ -5,3 +5,5 @@ export { dashboardService } from './dashboard';
 export type { TodaysSummary, WeekActivity } from './dashboard';
 export { symptomsService } from './symptoms';
 export type { CreateSymptomLogData } from './symptoms';
+export { moodService } from './mood';
+export type { CreateMoodLogData, MoodLogsResponse } from './mood';

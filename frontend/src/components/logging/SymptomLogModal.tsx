@@ -59,11 +59,19 @@ export function SymptomLogModal({ isOpen, onClose, onSuccess }: SymptomLogModalP
       const minutes = Math.floor(now.getMinutes() / 15) * 15;
       now.setMinutes(minutes, 0, 0);
 
+      // Format as local datetime (YYYY-MM-DDTHH:mm) without timezone conversion
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      const hours = String(now.getHours()).padStart(2, '0');
+      const mins = String(now.getMinutes()).padStart(2, '0');
+      const localDateTime = `${year}-${month}-${day}T${hours}:${mins}`;
+
       reset({
         symptomId: '',
         severity: 5,
         notes: '',
-        loggedAt: now.toISOString().slice(0, 16),
+        loggedAt: localDateTime,
       });
       setApiError(null);
       setSuccessMessage(null);
