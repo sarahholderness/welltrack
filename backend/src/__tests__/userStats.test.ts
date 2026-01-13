@@ -3,7 +3,7 @@ import app from '../app';
 import { prisma } from '../lib/prisma';
 import { cleanupTestUsers, disconnectDb } from './helpers/testDb';
 
-describe('GET /api/users/me/stats', () => {
+describe('GET /api/stats', () => {
   let accessToken: string;
   let userId: string;
   let symptomId: string;
@@ -52,7 +52,7 @@ describe('GET /api/users/me/stats', () => {
 
   it('should return stats structure with empty data', async () => {
     const response = await request(app)
-      .get('/api/users/me/stats')
+      .get('/api/stats')
       .set('Authorization', `Bearer ${accessToken}`);
 
     expect(response.status).toBe(200);
@@ -80,7 +80,7 @@ describe('GET /api/users/me/stats', () => {
     });
 
     const response = await request(app)
-      .get('/api/users/me/stats')
+      .get('/api/stats')
       .set('Authorization', `Bearer ${accessToken}`);
 
     expect(response.status).toBe(200);
@@ -100,7 +100,7 @@ describe('GET /api/users/me/stats', () => {
     });
 
     const response = await request(app)
-      .get('/api/users/me/stats')
+      .get('/api/stats')
       .set('Authorization', `Bearer ${accessToken}`);
 
     expect(response.status).toBe(200);
@@ -127,7 +127,7 @@ describe('GET /api/users/me/stats', () => {
     });
 
     const response = await request(app)
-      .get('/api/users/me/stats')
+      .get('/api/stats')
       .set('Authorization', `Bearer ${accessToken}`);
 
     expect(response.status).toBe(200);
@@ -152,7 +152,7 @@ describe('GET /api/users/me/stats', () => {
     }
 
     const response = await request(app)
-      .get('/api/users/me/stats')
+      .get('/api/stats')
       .set('Authorization', `Bearer ${accessToken}`);
 
     expect(response.status).toBe(200);
@@ -173,7 +173,7 @@ describe('GET /api/users/me/stats', () => {
     });
 
     const response = await request(app)
-      .get('/api/users/me/stats')
+      .get('/api/stats')
       .set('Authorization', `Bearer ${accessToken}`);
 
     expect(response.status).toBe(200);
@@ -193,7 +193,7 @@ describe('GET /api/users/me/stats', () => {
     });
 
     const response = await request(app)
-      .get('/api/users/me/stats')
+      .get('/api/stats')
       .set('Authorization', `Bearer ${accessToken}`);
 
     expect(response.status).toBe(200);
@@ -233,7 +233,7 @@ describe('GET /api/users/me/stats', () => {
     });
 
     const response = await request(app)
-      .get('/api/users/me/stats')
+      .get('/api/stats')
       .set('Authorization', `Bearer ${accessToken}`);
 
     expect(response.status).toBe(200);
@@ -266,7 +266,7 @@ describe('GET /api/users/me/stats', () => {
     });
 
     const response = await request(app)
-      .get('/api/users/me/stats')
+      .get('/api/stats')
       .set('Authorization', `Bearer ${accessToken}`);
 
     expect(response.status).toBe(200);
@@ -275,7 +275,7 @@ describe('GET /api/users/me/stats', () => {
   });
 
   it('should return 401 without token', async () => {
-    const response = await request(app).get('/api/users/me/stats');
+    const response = await request(app).get('/api/stats');
 
     expect(response.status).toBe(401);
     expect(response.body.error).toBe('No token provided');
@@ -283,7 +283,7 @@ describe('GET /api/users/me/stats', () => {
 
   it('should return 401 with invalid token', async () => {
     const response = await request(app)
-      .get('/api/users/me/stats')
+      .get('/api/stats')
       .set('Authorization', 'Bearer invalid-token');
 
     expect(response.status).toBe(401);

@@ -1016,6 +1016,52 @@ Delete a habit log.
 
 ---
 
+## Stats Endpoints
+
+### GET /stats
+
+Get aggregated statistics for the authenticated user.
+
+**Authentication:** Required
+
+**Success Response (200):**
+```json
+{
+  "stats": {
+    "averageMoodScore": 3.8,
+    "topSymptoms": [
+      {
+        "symptomId": "uuid",
+        "symptomName": "Headache",
+        "count": 12
+      },
+      {
+        "symptomId": "uuid",
+        "symptomName": "Fatigue",
+        "count": 8
+      }
+    ],
+    "currentStreak": 5,
+    "totalLogs": {
+      "symptoms": 45,
+      "moods": 30,
+      "medications": 60,
+      "habits": 120
+    }
+  }
+}
+```
+
+**Response Fields:**
+| Field | Type | Description |
+|-------|------|-------------|
+| averageMoodScore | number/null | Average mood score (1-5) for the last 30 days, null if no mood logs |
+| topSymptoms | array | Top 5 most logged symptoms in the last 30 days, sorted by frequency |
+| currentStreak | integer | Number of consecutive days with at least one log entry |
+| totalLogs | object | Total count of all logs by type (all-time) |
+
+---
+
 ## Error Response Format
 
 All error responses follow this format:

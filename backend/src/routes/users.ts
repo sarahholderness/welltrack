@@ -2,7 +2,6 @@ import { Router, Response, NextFunction } from 'express';
 import { prisma } from '../lib/prisma';
 import { authMiddleware, AuthRequest } from '../middleware/auth';
 import { updateUserSchema } from '../validators/user';
-import { getUserStats } from '../services/userStats';
 import { AppError, ErrorCode } from '../errors';
 
 const router = Router();
@@ -39,16 +38,6 @@ router.get('/me', async (req: AuthRequest, res: Response, next: NextFunction) =>
     }
 
     res.json({ user: formatUserResponse(user) });
-  } catch (error) {
-    next(error);
-  }
-});
-
-// GET /api/users/me/stats - Get current user's aggregated statistics
-router.get('/me/stats', async (req: AuthRequest, res: Response, next: NextFunction) => {
-  try {
-    const stats = await getUserStats(req.user!.userId);
-    res.json({ stats });
   } catch (error) {
     next(error);
   }

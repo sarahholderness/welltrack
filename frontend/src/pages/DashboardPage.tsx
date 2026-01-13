@@ -110,6 +110,58 @@ export function DashboardPage() {
         </div>
       )}
 
+      {/* Quick Add Buttons */}
+      <div>
+        <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-3">
+          Quick Add
+        </h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <button
+            onClick={() => setSymptomModalOpen(true)}
+            className="bg-white hover:bg-primary-50 border border-gray-200 hover:border-primary-200 p-4 rounded-lg text-left transition-colors group"
+          >
+            <div className="w-10 h-10 bg-primary-100 group-hover:bg-primary-200 rounded-lg flex items-center justify-center mb-3 transition-colors">
+              <HeartPulseIcon className="w-5 h-5 text-primary-600" />
+            </div>
+            <div className="text-gray-900 font-medium">Symptoms</div>
+            <div className="text-gray-500 text-sm">Log symptoms</div>
+          </button>
+
+          <button
+            onClick={() => setMoodModalOpen(true)}
+            className="bg-white hover:bg-secondary-50 border border-gray-200 hover:border-secondary-200 p-4 rounded-lg text-left transition-colors group"
+          >
+            <div className="w-10 h-10 bg-secondary-100 group-hover:bg-secondary-200 rounded-lg flex items-center justify-center mb-3 transition-colors">
+              <SmileIcon className="w-5 h-5 text-secondary-600" />
+            </div>
+            <div className="text-gray-900 font-medium">Mood</div>
+            <div className="text-gray-500 text-sm">Track mood</div>
+          </button>
+
+          <button
+            onClick={() => navigate('/log', { state: { tab: 'medications' } })}
+            className="bg-white hover:bg-blue-50 border border-gray-200 hover:border-blue-200 p-4 rounded-lg text-left transition-colors group"
+          >
+            <div className="w-10 h-10 bg-blue-100 group-hover:bg-blue-200 rounded-lg flex items-center justify-center mb-3 transition-colors">
+              <PillIcon className="w-5 h-5 text-blue-600" />
+            </div>
+            <div className="text-gray-900 font-medium">Medications</div>
+            <div className="text-gray-500 text-sm">Log meds</div>
+          </button>
+
+          <button
+            onClick={() => navigate('/log', { state: { tab: 'habits' } })}
+            className="bg-white hover:bg-purple-50 border border-gray-200 hover:border-purple-200 p-4 rounded-lg text-left transition-colors group"
+          >
+            <div className="w-10 h-10 bg-purple-100 group-hover:bg-purple-200 rounded-lg flex items-center justify-center mb-3 transition-colors">
+              <ActivityIcon className="w-5 h-5 text-purple-600" />
+            </div>
+            <div className="text-gray-900 font-medium">Habits</div>
+            <div className="text-gray-500 text-sm">Track habits</div>
+          </button>
+        </div>
+      </div>
+
       {/* Your Stats Card */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
@@ -174,17 +226,6 @@ export function DashboardPage() {
                 </div>
                 <div className="text-xs text-gray-500 mt-1">Total Logs</div>
               </div>
-
-              {/* Log Breakdown */}
-              <div className="text-center p-3 bg-blue-50 rounded-lg">
-                <div className="flex justify-center gap-2 text-sm font-medium text-blue-600">
-                  <span title="Symptoms">{stats.totalLogs.symptoms}S</span>
-                  <span title="Moods">{stats.totalLogs.moods}M</span>
-                  <span title="Meds">{stats.totalLogs.medications}R</span>
-                  <span title="Habits">{stats.totalLogs.habits}H</span>
-                </div>
-                <div className="text-xs text-gray-500 mt-1">By Type</div>
-              </div>
             </div>
 
             {/* Top Symptoms */}
@@ -204,60 +245,31 @@ export function DashboardPage() {
                 </div>
               </div>
             )}
+
+            {/* Total Logs by Type */}
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <div className="text-sm font-medium text-gray-700 mb-2">Total logs by type</div>
+              <div className="flex flex-wrap gap-2">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-primary-100 text-primary-700 rounded-full text-sm">
+                  Symptoms
+                  <span className="text-primary-500 text-xs">({stats.totalLogs.symptoms})</span>
+                </span>
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-secondary-100 text-secondary-700 rounded-full text-sm">
+                  Moods
+                  <span className="text-secondary-500 text-xs">({stats.totalLogs.moods})</span>
+                </span>
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
+                  Medications
+                  <span className="text-blue-500 text-xs">({stats.totalLogs.medications})</span>
+                </span>
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-purple-100 text-purple-700 rounded-full text-sm">
+                  Habits
+                  <span className="text-purple-500 text-xs">({stats.totalLogs.habits})</span>
+                </span>
+              </div>
+            </div>
           </div>
         ) : null}
-      </div>
-
-      {/* Quick Add Buttons */}
-      <div>
-        <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-3">
-          Quick Add
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <button
-            onClick={() => setSymptomModalOpen(true)}
-            className="bg-white hover:bg-primary-50 border border-gray-200 hover:border-primary-200 p-4 rounded-lg text-left transition-colors group"
-          >
-            <div className="w-10 h-10 bg-primary-100 group-hover:bg-primary-200 rounded-lg flex items-center justify-center mb-3 transition-colors">
-              <HeartPulseIcon className="w-5 h-5 text-primary-600" />
-            </div>
-            <div className="text-gray-900 font-medium">Symptoms</div>
-            <div className="text-gray-500 text-sm">Log symptoms</div>
-          </button>
-
-          <button
-            onClick={() => setMoodModalOpen(true)}
-            className="bg-white hover:bg-secondary-50 border border-gray-200 hover:border-secondary-200 p-4 rounded-lg text-left transition-colors group"
-          >
-            <div className="w-10 h-10 bg-secondary-100 group-hover:bg-secondary-200 rounded-lg flex items-center justify-center mb-3 transition-colors">
-              <SmileIcon className="w-5 h-5 text-secondary-600" />
-            </div>
-            <div className="text-gray-900 font-medium">Mood</div>
-            <div className="text-gray-500 text-sm">Track mood</div>
-          </button>
-
-          <button
-            onClick={() => navigate('/log', { state: { tab: 'medications' } })}
-            className="bg-white hover:bg-blue-50 border border-gray-200 hover:border-blue-200 p-4 rounded-lg text-left transition-colors group"
-          >
-            <div className="w-10 h-10 bg-blue-100 group-hover:bg-blue-200 rounded-lg flex items-center justify-center mb-3 transition-colors">
-              <PillIcon className="w-5 h-5 text-blue-600" />
-            </div>
-            <div className="text-gray-900 font-medium">Medications</div>
-            <div className="text-gray-500 text-sm">Log meds</div>
-          </button>
-
-          <button
-            onClick={() => navigate('/log', { state: { tab: 'habits' } })}
-            className="bg-white hover:bg-purple-50 border border-gray-200 hover:border-purple-200 p-4 rounded-lg text-left transition-colors group"
-          >
-            <div className="w-10 h-10 bg-purple-100 group-hover:bg-purple-200 rounded-lg flex items-center justify-center mb-3 transition-colors">
-              <ActivityIcon className="w-5 h-5 text-purple-600" />
-            </div>
-            <div className="text-gray-900 font-medium">Habits</div>
-            <div className="text-gray-500 text-sm">Track habits</div>
-          </button>
-        </div>
       </div>
 
       {/* Today's Summary */}
