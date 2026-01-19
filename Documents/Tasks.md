@@ -172,40 +172,40 @@ This document breaks down the WellTrack requirements into actionable development
 
 ### 2.7 Mood Logging
 
-- [ ] Create MoodLogModal component
-- [ ] Build mood selector with 5-point scale (emoji or color-coded)
-- [ ] Add optional energy level input (1-5)
-- [ ] Add optional stress level input (1-5)
-- [ ] Add optional notes textarea
-- [ ] Add date/time picker
-- [ ] Implement form submission
+- [x] Create MoodLogModal component
+- [x] Build mood selector with 5-point scale (emoji or color-coded)
+- [x] Add optional energy level input (1-5)
+- [x] Add optional stress level input (1-5)
+- [x] Add optional notes textarea
+- [x] Add date/time picker
+- [x] Implement form submission
 
 ### 2.8 Medication Logging
 
-- [ ] Create MedicationLogModal component
-- [ ] List user's active medications with checkboxes
-- [ ] Add "taken at" time picker
-- [ ] Add optional notes field
-- [ ] Implement form submission
+- [x] Create MedicationLogModal component
+- [x] List user's active medications with checkboxes
+- [x] Add "taken at" time picker
+- [x] Add optional notes field
+- [x] Implement form submission
 
 ### 2.9 Habit Logging
 
-- [ ] Create HabitLogModal component
-- [ ] Display habits grouped by tracking type
-- [ ] Build boolean habit toggle (yes/no)
-- [ ] Build numeric habit input with unit label
-- [ ] Build duration habit input (hours/minutes)
-- [ ] Add optional notes field
-- [ ] Implement form submission
+- [x] Create HabitLogModal component
+- [x] Display habits grouped by tracking type
+- [x] Build boolean habit toggle (yes/no)
+- [x] Build numeric habit input with unit label
+- [x] Build duration habit input (hours/minutes)
+- [x] Add optional notes field
+- [x] Implement form submission
 
 ### 2.10 TypeScript Types
 
-- [ ] Define User type matching backend model
-- [ ] Define Symptom and SymptomLog types
-- [ ] Define MoodLog type
-- [ ] Define Medication and MedicationLog types
-- [ ] Define Habit and HabitLog types
-- [ ] Define API response wrapper types
+- [x] Define User type matching backend model
+- [x] Define Symptom and SymptomLog types
+- [x] Define MoodLog type
+- [x] Define Medication and MedicationLog types
+- [x] Define Habit and HabitLog types
+- [x] Define API response wrapper types
 
 ---
 

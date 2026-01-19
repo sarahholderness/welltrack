@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { SymptomLogModal, MoodLogModal } from '../components/logging';
+import { SymptomLogModal, MoodLogModal, MedicationLogModal, HabitLogModal } from '../components/logging';
 import {
   HeartPulseIcon,
   SmileIcon,
@@ -18,6 +18,8 @@ export function LogPage() {
   const [activeTab, setActiveTab] = useState<LogTab>(initialTab);
   const [symptomModalOpen, setSymptomModalOpen] = useState(initialTab === 'symptoms');
   const [moodModalOpen, setMoodModalOpen] = useState(initialTab === 'mood');
+  const [medicationModalOpen, setMedicationModalOpen] = useState(initialTab === 'medications');
+  const [habitModalOpen, setHabitModalOpen] = useState(initialTab === 'habits');
 
   const handleSymptomSuccess = () => {
     // Navigate to dashboard to see the updated summary
@@ -59,11 +61,22 @@ export function LogPage() {
       setSymptomModalOpen(true);
     } else if (tabId === 'mood') {
       setMoodModalOpen(true);
+    } else if (tabId === 'medications') {
+      setMedicationModalOpen(true);
+    } else if (tabId === 'habits') {
+      setHabitModalOpen(true);
     }
-    // Future: open respective modals for other tabs
   };
 
   const handleMoodSuccess = () => {
+    navigate('/dashboard');
+  };
+
+  const handleMedicationSuccess = () => {
+    navigate('/dashboard');
+  };
+
+  const handleHabitSuccess = () => {
     navigate('/dashboard');
   };
 
@@ -131,8 +144,14 @@ export function LogPage() {
             <PillIcon className="w-12 h-12 mx-auto text-blue-400 mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">Log Medications</h3>
             <p className="text-gray-500 mb-4">
-              Medication logging will be implemented in task 2.8.
+              Track which medications you've taken and when.
             </p>
+            <button
+              onClick={() => setMedicationModalOpen(true)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Add Medication Entry
+            </button>
           </div>
         )}
 
@@ -141,8 +160,14 @@ export function LogPage() {
             <ActivityIcon className="w-12 h-12 mx-auto text-purple-400 mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">Log Habits</h3>
             <p className="text-gray-500 mb-4">
-              Habit logging will be implemented in task 2.9.
+              Track your daily habits like sleep, exercise, water intake, and more.
             </p>
+            <button
+              onClick={() => setHabitModalOpen(true)}
+              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+            >
+              Add Habit Entry
+            </button>
           </div>
         )}
       </div>
@@ -159,6 +184,20 @@ export function LogPage() {
         isOpen={moodModalOpen}
         onClose={() => setMoodModalOpen(false)}
         onSuccess={handleMoodSuccess}
+      />
+
+      {/* Medication Log Modal */}
+      <MedicationLogModal
+        isOpen={medicationModalOpen}
+        onClose={() => setMedicationModalOpen(false)}
+        onSuccess={handleMedicationSuccess}
+      />
+
+      {/* Habit Log Modal */}
+      <HabitLogModal
+        isOpen={habitModalOpen}
+        onClose={() => setHabitModalOpen(false)}
+        onSuccess={handleHabitSuccess}
       />
     </div>
   );

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useDashboard, useUserStats } from '../hooks';
-import { SymptomLogModal, MoodLogModal } from '../components/logging';
+import { SymptomLogModal, MoodLogModal, MedicationLogModal, HabitLogModal } from '../components/logging';
 import {
   HeartPulseIcon,
   SmileIcon,
@@ -20,6 +20,8 @@ export function DashboardPage() {
   const { stats, isLoading: statsLoading, error: statsError, refresh: refreshStats } = useUserStats();
   const [symptomModalOpen, setSymptomModalOpen] = useState(false);
   const [moodModalOpen, setMoodModalOpen] = useState(false);
+  const [medicationModalOpen, setMedicationModalOpen] = useState(false);
+  const [habitModalOpen, setHabitModalOpen] = useState(false);
 
   const greeting = () => {
     const hour = new Date().getHours();
@@ -139,7 +141,7 @@ export function DashboardPage() {
           </button>
 
           <button
-            onClick={() => navigate('/log', { state: { tab: 'medications' } })}
+            onClick={() => setMedicationModalOpen(true)}
             className="bg-white hover:bg-blue-50 border border-gray-200 hover:border-blue-200 p-4 rounded-lg text-left transition-colors group"
           >
             <div className="w-10 h-10 bg-blue-100 group-hover:bg-blue-200 rounded-lg flex items-center justify-center mb-3 transition-colors">
@@ -150,7 +152,7 @@ export function DashboardPage() {
           </button>
 
           <button
-            onClick={() => navigate('/log', { state: { tab: 'habits' } })}
+            onClick={() => setHabitModalOpen(true)}
             className="bg-white hover:bg-purple-50 border border-gray-200 hover:border-purple-200 p-4 rounded-lg text-left transition-colors group"
           >
             <div className="w-10 h-10 bg-purple-100 group-hover:bg-purple-200 rounded-lg flex items-center justify-center mb-3 transition-colors">
@@ -418,6 +420,26 @@ export function DashboardPage() {
         onClose={() => setMoodModalOpen(false)}
         onSuccess={() => {
           setMoodModalOpen(false);
+          refresh();
+        }}
+      />
+
+      {/* Medication Log Modal */}
+      <MedicationLogModal
+        isOpen={medicationModalOpen}
+        onClose={() => setMedicationModalOpen(false)}
+        onSuccess={() => {
+          setMedicationModalOpen(false);
+          refresh();
+        }}
+      />
+
+      {/* Habit Log Modal */}
+      <HabitLogModal
+        isOpen={habitModalOpen}
+        onClose={() => setHabitModalOpen(false)}
+        onSuccess={() => {
+          setHabitModalOpen(false);
           refresh();
         }}
       />

@@ -5,3 +5,4 @@ export { Modal } from './Modal';
 export { Select } from './Select';
 export { Slider } from './Slider';
 export { Textarea } from './Textarea';
+export { Checkbox } from './Checkbox';
